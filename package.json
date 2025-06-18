@@ -1,0 +1,17 @@
+{
+  "main": "dist-electron/main.js",
+  "type": "module",
+  "scripts": {
+    "build:electron": "esbuild electron/main.ts --bundle --platform=node --external:electron --outfile=dist-electron/main.js --format=esm",
+    "build:react": "cd frontend && bun run build",
+    "build:backend": "cd backend && bunx tsc",
+    "dev:electron": "bun run build:electron && bun run build:backend && electron dist-electron/main.js",
+    "dev:react": "cd frontend && bun run dev",
+    "dev:backend": "cd backend && bun run dev"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^31.0.9",
+    "esbuild": "^0.25.5"
+  }
+}
