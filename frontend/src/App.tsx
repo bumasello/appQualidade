@@ -1,30 +1,29 @@
 // src/App.tsx
-import React, { useState } from "react"; // Importe useState
+import React, { useState } from "react";
 import Aside from "./components/Aside";
 import redeDorLogo from "./assets/RDOR3.SA_BIG.png";
 
-// Importe a página de vínculo médico
-import VinculoMedicoPage from "./pages/VinculoMedico";
+import VinculoMedicoPage from "./pages/VinculoMedico"; // Certifique-se que o nome do arquivo está correto
 
-// Defina um tipo para as chaves de automação para melhor tipagem
 export type AutomationKey =
   | "home"
   | "vinculo-medico"
   | "dashboard"
   | "configuracoes"
-  | "relatorios"; // Adicione mais conforme necessário
+  | "relatorios";
 
 function App() {
-  // Estado para controlar qual automação está selecionada
   const [selectedAutomation, setSelectedAutomation] =
     useState<AutomationKey>("home");
 
-  // Função para renderizar o conteúdo principal com base na automação selecionada
   const renderMainContent = () => {
     switch (selectedAutomation) {
       case "home":
         return (
-          <div className="flex flex-col items-center justify-center h-full">
+          // REMOVIDO: flex flex-col items-center justify-center h-full
+          <div className="flex flex-col items-center justify-center">
+            {" "}
+            {/* Apenas o flex para o conteúdo interno */}
             <img
               src={redeDorLogo}
               alt="Logo Rede D'Or São Luiz"
@@ -39,16 +38,33 @@ function App() {
           </div>
         );
       case "vinculo-medico":
+        // VinculoMedicoPage já tem suas próprias classes de centralização
         return <VinculoMedicoPage />;
       case "dashboard":
-        return <h1 className="text-3xl font-bold text-white">Dashboard</h1>;
+        return (
+          // REMOVIDO: flex flex-col items-center justify-center h-full
+          <div className="flex flex-col items-center justify-center">
+            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+          </div>
+        );
       case "configuracoes":
-        return <h1 className="text-3xl font-bold text-white">Configurações</h1>;
+        return (
+          // REMOVIDO: flex flex-col items-center justify-center h-full
+          <div className="flex flex-col items-center justify-center">
+            <h1 className="text-3xl font-bold text-white">Configurações</h1>
+          </div>
+        );
       case "relatorios":
-        return <h1 className="text-3xl font-bold text-white">Relatórios</h1>;
+        return (
+          // REMOVIDO: flex flex-col items-center justify-center h-full
+          <div className="flex flex-col items-center justify-center">
+            <h1 className="text-3xl font-bold text-white">Relatórios</h1>
+          </div>
+        );
       default:
         return (
-          <div className="flex flex-col items-center justify-center h-full">
+          // REMOVIDO: flex flex-col items-center justify-center h-full
+          <div className="flex flex-col items-center justify-center">
             <h1 className="text-3xl font-bold text-white">
               Página não encontrada
             </h1>
@@ -61,18 +77,25 @@ function App() {
   };
 
   return (
-    // 1. Div externa para o background completo da tela
     <div className="h-screen w-screen bg-gray-800">
       <div className="flex h-full items-stretch">
-        {/* Passa a função de seleção e a automação selecionada para o Aside */}
         <Aside
           onSelectAutomation={setSelectedAutomation}
           selectedAutomation={selectedAutomation}
         />
-        {/* O conteúdo de navegação (Dashboard, Configurações, Relatórios) será movido para dentro do Aside */}
 
-        <main className="flex-1 p-8 text-white overflow-y-auto">
-          {renderMainContent()} {/* Renderiza o conteúdo dinamicamente */}
+        <main
+          className={`
+            flex-1 p-8 text-white overflow-y-auto
+          `}
+        >
+          {/* NOVO: Adicionado flex flex-col items-center justify-center h-full aqui */}
+          <div
+            key={selectedAutomation}
+            className="animate-fade-in flex flex-col items-center justify-center h-full"
+          >
+            {renderMainContent()}
+          </div>
         </main>
       </div>
     </div>
