@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import Aside from "./components/Aside";
 import redeDorLogo from "./assets/RDOR3.SA_BIG.png";
 
-import VinculoMedicoPage from "./pages/VinculoMedico"; // Certifique-se que o nome do arquivo está correto
+import VinculoMedicoPage from "./pages/VinculoMedico";
+import { Toaster } from "@/components/ui/sonner"; // Importe o Toaster
 
 export type AutomationKey =
   | "home"
@@ -20,10 +21,7 @@ function App() {
     switch (selectedAutomation) {
       case "home":
         return (
-          // REMOVIDO: flex flex-col items-center justify-center h-full
           <div className="flex flex-col items-center justify-center">
-            {" "}
-            {/* Apenas o flex para o conteúdo interno */}
             <img
               src={redeDorLogo}
               alt="Logo Rede D'Or São Luiz"
@@ -38,33 +36,28 @@ function App() {
           </div>
         );
       case "vinculo-medico":
-        // VinculoMedicoPage já tem suas próprias classes de centralização
         return <VinculoMedicoPage />;
       case "dashboard":
         return (
-          // REMOVIDO: flex flex-col items-center justify-center h-full
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center h-full">
             <h1 className="text-3xl font-bold text-white">Dashboard</h1>
           </div>
         );
       case "configuracoes":
         return (
-          // REMOVIDO: flex flex-col items-center justify-center h-full
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center h-full">
             <h1 className="text-3xl font-bold text-white">Configurações</h1>
           </div>
         );
       case "relatorios":
         return (
-          // REMOVIDO: flex flex-col items-center justify-center h-full
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center h-full">
             <h1 className="text-3xl font-bold text-white">Relatórios</h1>
           </div>
         );
       default:
         return (
-          // REMOVIDO: flex flex-col items-center justify-center h-full
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center h-full">
             <h1 className="text-3xl font-bold text-white">
               Página não encontrada
             </h1>
@@ -89,7 +82,6 @@ function App() {
             flex-1 p-8 text-white overflow-y-auto
           `}
         >
-          {/* NOVO: Adicionado flex flex-col items-center justify-center h-full aqui */}
           <div
             key={selectedAutomation}
             className="animate-fade-in flex flex-col items-center justify-center h-full"
@@ -98,6 +90,13 @@ function App() {
           </div>
         </main>
       </div>
+      <Toaster
+        theme="dark" // Define o tema escuro
+        className="toaster-custom-class" // Adiciona uma classe para estilos personalizados via CSS
+        richColors // Adiciona cores ricas para diferentes tipos de toast (success, error, warning, info)
+        position="bottom-right" // Posição do toast na tela
+      />{" "}
+      {/* Adicione o Toaster aqui, geralmente no final do App */}
     </div>
   );
 }

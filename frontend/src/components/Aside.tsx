@@ -1,13 +1,16 @@
 // src/components/Aside.tsx
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react"; // Removido ChevronDown, ChevronUp pois AccordionTrigger já tem
+import {
+  ChevronLeft,
+  ChevronRight,
+  LayoutDashboard,
+  Settings,
+  BarChart,
+  Stethoscope,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Remova os imports de Collapsible
-// import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-
-// Importe os componentes do Accordion
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import type { AutomationKey } from "../App"; // Importe o tipo AutomationKey
+import type { AutomationKey } from "../App";
 
 interface AsideProps {
   onSelectAutomation: (key: AutomationKey) => void;
@@ -27,18 +30,15 @@ const Aside: React.FC<AsideProps> = ({
   selectedAutomation,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  // O Accordion gerencia seu próprio estado de abertura/fechamento.
-  // Usamos 'single' para que apenas um item esteja aberto por vez.
   const [openAccordionItem, setOpenAccordionItem] = useState<
     string | undefined
-  >(undefined); // Estado para controlar qual item do accordion está aberto
+  >(undefined);
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
-    // Ao colapsar o aside, feche qualquer item do accordion que esteja aberto
-    if (!isCollapsed) {
-      setOpenAccordionItem(undefined);
-    }
+    // if (!isCollapsed) {
+    //   setOpenAccordionItem(undefined);
+    // }
   };
 
   return (
@@ -46,24 +46,20 @@ const Aside: React.FC<AsideProps> = ({
       className={cn(
         "relative flex flex-col h-80% text-white",
         "bg-gray-900 backdrop-blur-sm",
-        "rounded-xl shadow-2xl", // Sombra padrão visível quando não há hover
-        "transition-all duration-300 ease-in-out", // Garante transição suave para todas as propriedades, incluindo a sombra
-        isCollapsed ? "w-16" : "w-48",
+        "rounded-xl shadow-2xl",
+        "transition-all duration-300 ease-in-out",
+        isCollapsed ? "w-16" : "w-52",
         "ml-4 my-4 flex-shrink-0",
-        "hover:shadow-none", // A sombra desaparece ao passar o mouse
+        "hover:shadow-none",
       )}
     >
       {/* Botão de Toggle */}
-      <div
-        className={`
-          absolute top-1/2 -translate-y-1/2 -right-4 z-10
-        `}
-      >
+      <div className="absolute top-1/2 -translate-y-1/2 -right-4 z-10">
         <Button
           variant="secondary"
           size="icon"
           onClick={toggleCollapse}
-          className="rounded-full"
+          className="rounded-full shadow-lg"
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -73,113 +69,136 @@ const Aside: React.FC<AsideProps> = ({
         </Button>
       </div>
 
-      {/* Conteúdo do Aside */}
       <div className="flex-1 p-4 overflow-hidden">
-        <div
-          style={{
-            transition: "all 300ms ease-in-out",
-            opacity: isCollapsed ? 0 : 1,
-            pointerEvents: isCollapsed ? "none" : "auto",
-          }}
-        >
+        {!isCollapsed && (
           <h2 className="text-xl font-semibold mb-4 whitespace-nowrap">
             Menu Principal
           </h2>
+        )}
 
-          {/* Seção de Navegação Principal (Dashboard, Configurações, Relatórios) */}
-          <nav className="space-y-2 mb-4">
-            <a
-              href="#"
-              onClick={() => onSelectAutomation("dashboard")}
+        {/* Todos os itens agrupados para uniformizar espaçamento */}
+        <nav className="space-y-2 mb-4">
+          <a
+            href="#"
+            onClick={() => !isCollapsed && onSelectAutomation("dashboard")}
+            className={cn(
+              "flex items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
+              selectedAutomation === "dashboard"
+                ? "bg-blue-600 text-white"
+                : !isCollapsed && "hover:bg-gray-700",
+              isCollapsed && "cursor-default",
+            )}
+          >
+            <LayoutDashboard className="h-5 w-5 shrink-0" />
+            <span
               className={cn(
-                "transition-all duration-300 ease-in-out block p-2 rounded-xl mx-2",
-                selectedAutomation === "dashboard"
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-gray-700",
+                "ml-3 whitespace-nowrap transition-all duration-300 ease-in-out",
+                isCollapsed
+                  ? "w-0 opacity-0 overflow-hidden"
+                  : "w-auto opacity-100",
               )}
             >
               Dashboard
-            </a>
-            <a
-              href="#"
-              onClick={() => onSelectAutomation("configuracoes")}
+            </span>
+          </a>
+
+          <a
+            href="#"
+            onClick={() => !isCollapsed && onSelectAutomation("configuracoes")}
+            className={cn(
+              "flex items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
+              selectedAutomation === "configuracoes"
+                ? "bg-blue-600 text-white"
+                : !isCollapsed && "hover:bg-gray-700",
+              isCollapsed && "cursor-default",
+            )}
+          >
+            <Settings className="h-5 w-5 shrink-0" />
+            <span
               className={cn(
-                "transition-all duration-300 ease-in-out block p-2 rounded-xl mx-2",
-                selectedAutomation === "configuracoes"
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-gray-700",
+                "ml-3 whitespace-nowrap transition-all duration-300 ease-in-out",
+                isCollapsed
+                  ? "w-0 opacity-0 overflow-hidden"
+                  : "w-auto opacity-100",
               )}
             >
               Configurações
-            </a>
-            <a
-              href="#"
-              onClick={() => onSelectAutomation("relatorios")}
+            </span>
+          </a>
+
+          <a
+            href="#"
+            onClick={() => !isCollapsed && onSelectAutomation("relatorios")}
+            className={cn(
+              "flex items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
+              selectedAutomation === "relatorios"
+                ? "bg-blue-600 text-white"
+                : !isCollapsed && "hover:bg-gray-700",
+              isCollapsed && "cursor-default",
+            )}
+          >
+            <BarChart className="h-5 w-5 shrink-0" />
+            <span
               className={cn(
-                "transition-all duration-300 ease-in-out block p-2 rounded-xl mx-2",
-                selectedAutomation === "relatorios"
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-gray-700",
+                "ml-3 whitespace-nowrap transition-all duration-300 ease-in-out",
+                isCollapsed
+                  ? "w-0 opacity-0 overflow-hidden"
+                  : "w-auto opacity-100",
               )}
             >
               Relatórios
-            </a>
-          </nav>
+            </span>
+          </a>
 
-          {/* Contexto: Médicos (Accordion) */}
-          <Accordion
-            type="single" // Permite que apenas um item do accordion esteja aberto por vez
-            collapsible // Permite que o item aberto seja fechado ao clicar novamente no seu trigger
-            value={openAccordionItem} // Controla qual item está aberto
-            onValueChange={setOpenAccordionItem} // Atualiza o estado quando um item é aberto/fechado
-            className="w-full" // Accordion ocupa a largura total disponível
+          {/* Item Médicos — ícone sempre visível, label/accordion só quando expandido */}
+          <div
+            className={cn(
+              "flex items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
+              selectedAutomation === "vinculo-medico" && isCollapsed
+                ? "bg-blue-600 text-white"
+                : "",
+              isCollapsed && "cursor-default",
+            )}
           >
-            <AccordionItem value="item-medicos">
-              {" "}
-              {/* Cada item do accordion precisa de um valor único */}
-              <AccordionTrigger className="flex items-center justify-between p-2 rounded-xl mx-2 cursor-pointer hover:bg-gray-700 transition-all duration-300 ease-in-out">
-                <span className="font-medium whitespace-nowrap">Médicos</span>
-                {/* O AccordionTrigger já adiciona um ícone de seta por padrão, não precisa de ChevronDown/Up aqui */}
-              </AccordionTrigger>
-              <AccordionContent className="space-y-2 mt-2 pl-6">
-                <a
-                  href="#"
-                  onClick={() => onSelectAutomation("vinculo-medico")}
-                  className={cn(
-                    "block p-2 rounded-xl whitespace-nowrap",
-                    selectedAutomation === "vinculo-medico"
-                      ? "bg-blue-600 text-white"
-                      : "hover:bg-gray-700",
-                  )}
-                >
-                  Vínculo Médico
-                </a>
-                {/* Adicione outras automações de Médicos aqui */}
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Exemplo de outro item do Accordion (Pacientes) */}
-            {/*
-            <AccordionItem value="item-pacientes">
-              <AccordionTrigger className="flex items-center justify-between p-2 rounded-xl mx-2 cursor-pointer hover:bg-gray-700 transition-all duration-300 ease-in-out">
-                <span className="font-medium whitespace-nowrap">Pacientes</span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-2 pl-6">
-                <a
-                  href="#"
-                  onClick={() => onSelectAutomation("cadastrar-paciente")}
-                  className={cn(
-                    "block p-2 rounded-xl whitespace-nowrap",
-                    selectedAutomation === "cadastrar-paciente" ? "bg-blue-600 text-white" : "hover:bg-gray-700"
-                  )}
-                >
-                  Cadastrar Paciente
-                </a>
-              </AccordionContent>
-            </AccordionItem>
-            */}
-          </Accordion>
-        </div>
+            <Stethoscope className="h-5 w-5 shrink-0" />
+            {!isCollapsed && (
+              <Accordion
+                type="single"
+                collapsible
+                value={openAccordionItem}
+                onValueChange={setOpenAccordionItem}
+                className="w-full ml-2"
+              >
+                <AccordionItem value="item-medicos">
+                  <AccordionTrigger
+                    className={cn(
+                      "flex justify-between items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
+                      "hover:bg-gray-700",
+                    )}
+                  >
+                    <span className="whitespace-nowrap">Médicos</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2 mt-2">
+                    <a
+                      href="#"
+                      onClick={() =>
+                        !isCollapsed && onSelectAutomation("vinculo-medico")
+                      }
+                      className={cn(
+                        "block p-2 rounded-xl whitespace-nowrap",
+                        selectedAutomation === "vinculo-medico"
+                          ? "bg-blue-600 text-white"
+                          : "hover:bg-gray-700",
+                      )}
+                    >
+                      Vínculo Médico
+                    </a>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
+          </div>
+        </nav>
       </div>
     </aside>
   );
