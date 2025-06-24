@@ -5,7 +5,7 @@
     "build:electron": "esbuild electron/main.ts --bundle --platform=node --external:electron --outfile=dist-electron/main.js --format=esm",
     "build:react": "cd frontend && bun run build",
     "build:backend": "cd backend && bunx tsc",
-    "dev:electron": "bun run build:electron && bun run build:backend && electron dist-electron/main.js",
+    "dev:electron": "bun run build:electron && bun run build:react && bun run build:backend && electron dist-electron/main.js",
     "dev:react": "cd frontend && bun run dev",
     "dev:backend": "cd backend && bun run dev"
   },

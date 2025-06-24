@@ -1,5 +1,5 @@
 // src/App.tsx
-import React, { useState } from "react";
+import { useState } from "react";
 import Aside from "./components/Aside";
 import redeDorLogo from "./assets/RDOR3.SA_BIG.png";
 

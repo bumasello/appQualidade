@@ -9,11 +9,11 @@ class OracleDatabase {
     static pool;
     static async initPool() {
         const libDir = process.env.ORACLE_CLIENT_LIB_DIR;
-        if (!libDir) {
-            console.error("Variável de ambiente ORACLE_CLIENT_LIB_DIR não definida.");
-            // Lide com este erro, talvez lançando uma exceção ou saindo
-            throw new Error("ORACLE_CLIENT_LIB_DIR not set.");
-        }
+        // if (!libDir) {
+        //   console.error("Variável de ambiente ORACLE_CLIENT_LIB_DIR não definida.");
+        //   // Lide com este erro, talvez lançando uma exceção ou saindo
+        //   throw new Error("ORACLE_CLIENT_LIB_DIR not set.");
+        // }
         oracledb_1.default.initOracleClient({
             libDir: libDir,
         });
