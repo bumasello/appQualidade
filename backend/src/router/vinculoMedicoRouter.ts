@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { VinculoMedicoController } from "../controller/vinculoMedicoController";
+import upload from "../config/multerConfig";
 
 const router = Router();
 
@@ -9,6 +10,10 @@ router.post("/vincular", vinculoMedicoController.vinculaMedico);
 
 router.get("/buscar", vinculoMedicoController.buscaMedico);
 
-router.post("vincularbatch", vinculoMedicoController.vinculaMedicoBatch);
+router.post(
+  "/vincularbatch",
+  upload.single("excelFile"),
+  vinculoMedicoController.vinculaMedicoBatch
+);
 
 export default router;

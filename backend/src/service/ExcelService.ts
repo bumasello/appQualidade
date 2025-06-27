@@ -17,7 +17,7 @@ class ExcelService {
   public async processVinculoExcel(
     // Adicionado 'async' pois retorna uma Promise
     buffer: Buffer,
-    requiredHeaders: string[],
+    requiredHeaders: string[]
   ): Promise<ExcelProcessingResult> {
     const result: ExcelProcessingResult = {
       success: true,
@@ -51,20 +51,22 @@ class ExcelService {
       const dataRows: (string | number | boolean | null)[][] = rawData.slice(1);
 
       const missingRequiredHeaders = requiredHeaders.filter(
-        (h) => !headers.includes(h),
+        (h) => !headers.includes(h)
       );
 
       if (missingRequiredHeaders.length > 0) {
         throw new AppError(
-          `Cabeçalhos obrigatórios ausentes na planilha: ${missingRequiredHeaders.join(", ")}.`,
-          400,
+          `Cabeçalhos obrigatórios ausentes na planilha: ${missingRequiredHeaders.join(
+            ", "
+          )}.`,
+          400
         );
       }
 
       // Obtém todas as chaves válidas da interface VinculoMedicoExcelRow para segurança de tipo
       // Isso garante que só mapeamos para propriedades que realmente existem na nossa interface
       const validExcelRowKeys = new Set(
-        Object.keys({} as VinculoMedicoExcelRow),
+        Object.keys({} as VinculoMedicoExcelRow)
       );
 
       dataRows.forEach(
@@ -113,7 +115,7 @@ class ExcelService {
             result.processedCount++;
             result.data.push(mappedRow as VinculoMedicoExcelRow);
           }
-        },
+        }
       );
 
       if (result.failedCount > 0) {
@@ -121,6 +123,7 @@ class ExcelService {
         result.message = `Processamento estrutural do Excel concluído com ${result.failedCount} erros.`;
       }
       // IMPORTANTE: Retorna o objeto 'result' aqui
+      console.log(result);
       return result;
     } catch (error: any) {
       result.success = false;
