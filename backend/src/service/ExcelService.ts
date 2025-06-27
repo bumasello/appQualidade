@@ -48,7 +48,7 @@ class ExcelService {
 
   public async processVinculoExcel(
     buffer: Buffer,
-    requiredHeaders: string[],
+    requiredHeaders: string[]
   ): Promise<ExcelProcessingResult> {
     const result: ExcelProcessingResult = {
       success: true,
@@ -76,32 +76,34 @@ class ExcelService {
       }
 
       const headers: string[] = rawData[0].map((h) => String(h).trim());
-      console.log("1. Cabeçalhos lidos da planilha (trim):", headers);
-      console.log("2. Cabeçalhos requeridos:", requiredHeaders);
+      // console.log("1. Cabeçalhos lidos da planilha (trim):", headers);
+      // console.log("2. Cabeçalhos requeridos:", requiredHeaders);
 
       const dataRows: (string | number | boolean | null)[][] = rawData.slice(1);
 
       const missingRequiredHeaders = requiredHeaders.filter(
-        (h) => !headers.includes(h),
+        (h) => !headers.includes(h)
       );
 
       if (missingRequiredHeaders.length > 0) {
-        console.log(
-          "3. Cabeçalhos requeridos ausentes (se houver):",
-          missingRequiredHeaders,
-        );
+        // console.log(
+        //   "3. Cabeçalhos requeridos ausentes (se houver):",
+        //   missingRequiredHeaders,
+        // );
         throw new AppError(
-          `Cabeçalhos obrigatórios ausentes na planilha: ${missingRequiredHeaders.join(", ")}.`,
-          400,
+          `Cabeçalhos obrigatórios ausentes na planilha: ${missingRequiredHeaders.join(
+            ", "
+          )}.`,
+          400
         );
       }
 
       // Agora, usamos a lista explícita de chaves
       const validExcelRowKeys = new Set(this.ALL_VINCULO_MEDICO_EXCEL_ROW_KEYS);
-      console.log(
-        "4. Chaves válidas na interface VinculoMedicoExcelRow:",
-        Array.from(validExcelRowKeys),
-      ); // Agora não será vazio!
+      // console.log(
+      //   "4. Chaves válidas na interface VinculoMedicoExcelRow:",
+      //   Array.from(validExcelRowKeys),
+      // ); // Agora não será vazio!
 
       dataRows.forEach(
         (row: (string | number | boolean | null)[], rowIndex: number) => {
@@ -123,19 +125,19 @@ class ExcelService {
             }
           });
 
-          console.log(
-            `5. Linha ${rowNum} - Objeto mapeado antes da validação de presença:`,
-            mappedRow,
-          );
+          // console.log(
+          //   `5. Linha ${rowNum} - Objeto mapeado antes da validação de presença:`,
+          //   mappedRow,
+          // );
 
           requiredHeaders.forEach((requiredHeader) => {
             const propName = requiredHeader as keyof VinculoMedicoExcelRow;
             // Verifica se o valor mapeado para o cabeçalho obrigatório é nulo ou vazio
             if (!mappedRow[propName]) {
-              console.log(
-                `6. Erro na linha ${rowNum}: Valor ausente para "${requiredHeader}". Valor mapeado:`,
-                mappedRow[propName],
-              );
+              // console.log(
+              //   `6. Erro na linha ${rowNum}: Valor ausente para "${requiredHeader}". Valor mapeado:`,
+              //   mappedRow[propName],
+              // );
               rowErrors.push({
                 message: `${requiredHeader} é obrigatório.`,
                 column: requiredHeader,
@@ -153,7 +155,7 @@ class ExcelService {
             result.processedCount++;
             result.data.push(mappedRow as VinculoMedicoExcelRow);
           }
-        },
+        }
       );
 
       if (result.failedCount > 0) {

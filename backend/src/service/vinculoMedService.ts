@@ -26,7 +26,7 @@ class VinculoMedicoService {
       const result = await conn.execute(
         "update bcr.BCR_CTR_EXT_CNS_PRF set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf",
         { cpf: vinculo.cpf, crm: vinculo.crm, uf: vinculo.uf },
-        { autoCommit: true },
+        { autoCommit: true }
       );
       if (result.rowsAffected && result.rowsAffected > 0) {
         return {
@@ -42,7 +42,7 @@ class VinculoMedicoService {
     } catch (error) {
       console.error(
         "[VinculoMedicoService] Erro ao realizar vínculo médico:",
-        error,
+        error
       );
       throw new Error("Erro ao criar vínculo médico.");
     } finally {
@@ -52,7 +52,7 @@ class VinculoMedicoService {
 
   public async buscaMedico(
     crm: string,
-    uf: string,
+    uf: string
   ): Promise<BuscaMedicoResult> {
     const medico: Medico = {
       crm: crm,
@@ -65,7 +65,7 @@ class VinculoMedicoService {
       const result = await conn.execute(
         "SELECT nome, NR_DOC_PRF AS crm, SG_UF AS uf, NR_CPF AS cpf FROM bcr.BCR_CTR_EXT_CNS_PRF WHERE NR_DOC_PRF = :crm AND SG_UF = :uf",
         { crm: medico.crm, uf: medico.uf },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
 
       if (result.rows && result.rows.length > 0) {
@@ -85,7 +85,7 @@ class VinculoMedicoService {
     } catch (error) {
       console.error(
         "[VinculoMedicoService] Erro ao realizar busca do médico: ",
-        error,
+        error
       );
       throw new Error("Erro ao criar vínculo médico.");
     } finally {
@@ -94,7 +94,7 @@ class VinculoMedicoService {
   }
 
   public async processaVinculoMedicoBatch(
-    data: VinculoMedicoExcelRow[],
+    data: VinculoMedicoExcelRow[]
   ): Promise<BatchProcessingResult> {
     const result: BatchProcessingResult = {
       success: true,
@@ -116,11 +116,11 @@ class VinculoMedicoService {
           const updateResult = await conn.execute(
             "update bcr.BCR_CTR_EXT_CNS_PRF set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf",
             {
-              nr_cpf: rowData.NR_CPF,
+              nr_cpf: rowData["CPF rec Federal"],
               num_conselho: rowData["Nº conselho"],
               uf_conselho: rowData["UF conselho"],
             },
-            { autoCommit: false }, // Isso garante que a transação não seja commitada após cada UPDATE
+            { autoCommit: false } // Isso garante que a transação não seja commitada após cada UPDATE
           );
 
           if (updateResult.rowsAffected && updateResult.rowsAffected > 0) {
@@ -164,7 +164,7 @@ class VinculoMedicoService {
       }
       console.error(
         "[VinculoMedicoService] Erro geral no processamento em lote:",
-        error,
+        error
       );
       result.success = false;
       result.message =
