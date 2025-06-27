@@ -26,7 +26,7 @@ class VinculoMedicoService {
       const result = await conn.execute(
         "update bcr.BCR_CTR_EXT_CNS_PRF set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf",
         { cpf: vinculo.cpf, crm: vinculo.crm, uf: vinculo.uf },
-        { autoCommit: true }
+        { autoCommit: true },
       );
       if (result.rowsAffected && result.rowsAffected > 0) {
         return {
@@ -42,7 +42,7 @@ class VinculoMedicoService {
     } catch (error) {
       console.error(
         "[VinculoMedicoService] Erro ao realizar vínculo médico:",
-        error
+        error,
       );
       throw new Error("Erro ao criar vínculo médico.");
     } finally {
@@ -52,7 +52,7 @@ class VinculoMedicoService {
 
   public async buscaMedico(
     crm: string,
-    uf: string
+    uf: string,
   ): Promise<BuscaMedicoResult> {
     const medico: Medico = {
       crm: crm,
@@ -65,7 +65,7 @@ class VinculoMedicoService {
       const result = await conn.execute(
         "SELECT nome, NR_DOC_PRF AS crm, SG_UF AS uf, NR_CPF AS cpf FROM bcr.BCR_CTR_EXT_CNS_PRF WHERE NR_DOC_PRF = :crm AND SG_UF = :uf",
         { crm: medico.crm, uf: medico.uf },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
 
       if (result.rows && result.rows.length > 0) {
@@ -85,7 +85,7 @@ class VinculoMedicoService {
     } catch (error) {
       console.error(
         "[VinculoMedicoService] Erro ao realizar busca do médico: ",
-        error
+        error,
       );
       throw new Error("Erro ao criar vínculo médico.");
     } finally {
@@ -94,7 +94,7 @@ class VinculoMedicoService {
   }
 
   public async processaVinculoMedicoBatch(
-    data: VinculoMedicoExcelRow[]
+    data: VinculoMedicoExcelRow[],
   ): Promise<BatchProcessingResult> {
     const result: BatchProcessingResult = {
       success: true,
@@ -108,19 +108,77 @@ class VinculoMedicoService {
     let conn: oracledb.Connection | undefined;
     try {
       conn = await OracleDatabase.getConnection();
-      // REMOVA ESTA LINHA: await conn.beginTransaction(); // Esta linha causava o erro
+      // A transação é iniciada implicitamente com a primeira DML e autoCommit: false
 
       for (const rowData of data) {
         try {
+          // Validações de Regra de Negócio
+          // rowData["Nº conselho"], rowData["UF conselho"], rowData.NR_CPF são garantidos como não-nulos pelo ExcelProcessingService
+
+          // Validação de formato de CPF
+          // if (!isValidCPF(rowData.NR_CPF)) {
+          //   result.failedUpdates++;
+          //   result.errors.push({
+          //     rowData,
+          //     message: "CPF inválido.",
+          //     type: "business",
+          //   });
+          //   continue;
+          // }
+
+          // Validação de UF (formato ou lista de UFs válidas)
+          const ufConselho = rowData["UF conselho"]?.toUpperCase();
+          const validUFs = [
+            "AC",
+            "AL",
+            "AP",
+            "AM",
+            "BA",
+            "CE",
+            "DF",
+            "ES",
+            "GO",
+            "MA",
+            "MT",
+            "MS",
+            "MG",
+            "PA",
+            "PB",
+            "PR",
+            "PE",
+            "PI",
+            "RJ",
+            "RN",
+            "RS",
+            "RO",
+            "RR",
+            "SC",
+            "SP",
+            "SE",
+            "TO",
+          ];
+          if (!ufConselho || !validUFs.includes(ufConselho)) {
+            result.failedUpdates++;
+            result.errors.push({
+              rowData,
+              message: `UF '${rowData["UF conselho"]}' inválido.`,
+              type: "business",
+            });
+            continue;
+          }
+
           // Realizar a operação de UPDATE no banco de dados
+          // A query é fixa: "update bcr.BCR_CTR_EXT_CNS_PRF set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf"
+          // O objeto de parâmetros DEVE ter as chaves 'cpf', 'crm' e 'uf'
           const updateResult = await conn.execute(
             "update bcr.BCR_CTR_EXT_CNS_PRF set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf",
             {
-              nr_cpf: rowData["CPF rec Federal"],
-              num_conselho: rowData["Nº conselho"],
-              uf_conselho: rowData["UF conselho"],
+              // Mapeia os dados da planilha para os nomes dos parâmetros de bind da query
+              cpf: rowData["CPF rec Federal"], // Valor da coluna NR_CPF da planilha para o bind :cpf
+              crm: rowData["Nº conselho"], // Valor da coluna "Nº conselho" da planilha para o bind :crm
+              uf: rowData["UF conselho"], // Valor da coluna "UF conselho" da planilha para o bind :uf
             },
-            { autoCommit: false } // Isso garante que a transação não seja commitada após cada UPDATE
+            { autoCommit: false }, // Não fazer commit individualmente
           );
 
           if (updateResult.rowsAffected && updateResult.rowsAffected > 0) {
@@ -153,10 +211,9 @@ class VinculoMedicoService {
         result.message = `Processamento de vínculos concluído com ${result.failedUpdates} falhas. A transação foi revertida.`;
       }
     } catch (error: any) {
-      // Em caso de erro geral (ex: falha na conexão)
       if (conn) {
         try {
-          await conn.rollback(); // Garante que a transação seja revertida em caso de erro inesperado
+          await conn.rollback();
           console.error("Transação revertida devido a erro geral.");
         } catch (rollbackError) {
           console.error("Erro ao tentar reverter transação:", rollbackError);
@@ -164,7 +221,7 @@ class VinculoMedicoService {
       }
       console.error(
         "[VinculoMedicoService] Erro geral no processamento em lote:",
-        error
+        error,
       );
       result.success = false;
       result.message =
