@@ -1,19 +1,22 @@
 import { AppError } from "../error/appError";
 import VinculoMedicoService from "../service/vinculoMedService";
+import ExcelService from "../service/ExcelService";
 
 import type { Request, Response, NextFunction } from "express";
 
 export class VinculoMedicoController {
   private viculoMedicoService: VinculoMedicoService;
+  private excelService: ExcelService;
 
   constructor() {
     this.viculoMedicoService = new VinculoMedicoService();
+    this.excelService = new ExcelService();
   }
 
   public vinculaMedico = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const { crm, uf, cpf } = req.body;
@@ -21,14 +24,14 @@ export class VinculoMedicoController {
       if (!crm || !uf || !cpf) {
         throw new AppError(
           "[vinculaMedico] Todos os campos são obrigatórios!",
-          422
+          422,
         );
       }
 
       const result = await this.viculoMedicoService.realizaVinculoMedico(
         crm,
         uf,
-        cpf
+        cpf,
       );
 
       if (result.success) {
@@ -46,7 +49,7 @@ export class VinculoMedicoController {
   public buscaMedico = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const { crm, uf } = req.query;
@@ -54,7 +57,7 @@ export class VinculoMedicoController {
       if (!crm || !uf) {
         throw new AppError(
           "[buscaMedico] Todos os campos são obrigatórios!",
-          422
+          422,
         );
       }
 
@@ -83,7 +86,7 @@ export class VinculoMedicoController {
 
       const result = await this.viculoMedicoService.buscaMedico(
         crmValue,
-        ufValue
+        ufValue,
       );
 
       if (result.success) {
@@ -91,6 +94,48 @@ export class VinculoMedicoController {
       } else {
         throw new AppError(result.message || "Erro ao buscar médico.", 400);
       }
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public vinculaMedicoBatch = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      if (!req.file || !req.file.buffer) {
+        throw new AppError(
+          "Nenhum ficheiro Excel foi enviado ou o ficheiro está vazio.",
+          400,
+        );
+      }
+      const requiredHeaders = ["NR_DOC_PROF", "UF_DOCUMENTO", "NR_CPF"];
+
+      const excelProcessResult = await this.excelService.processVinculoExcel(
+        req.file.buffer,
+        requiredHeaders,
+      );
+      if (
+        !excelProcessResult.success ||
+        !excelProcessResult.data ||
+        excelProcessResult.data.length === 0
+      ) {
+        throw new AppError(
+          excelProcessResult.message ||
+            "Erro no processamento estrutural da planilha.",
+          400,
+          // excelProcessResult.errors,
+        );
+      }
+
+      console.log(excelProcessResult);
+      res.status(200).json({
+        success: true,
+        // message: `Planilha processada com sucesso! ${batchProcessResult.successfulUpdates} vínculos atualizados, ${batchProcessResult.failedUpdates} falharam.`,
+        // details: batchProcessResult,
+      });
     } catch (error) {
       next(error);
     }

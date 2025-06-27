@@ -46,7 +46,7 @@ export interface ExcelProcessingResult {
   processedCount: number; // Quantidade de linhas válidas estruturalmente
   failedCount: number; // Quantidade de linhas com erros estruturais
   errors: { row: number; message: string; column?: string }[]; // Detalhes dos erros estruturais
-  data?: VinculoMedicoExcelRow[]; // Os dados mapeados e tipados
+  data: VinculoMedicoExcelRow[]; // Os dados mapeados e tipados
 }
 
 // Resultado do processamento em lote no VinculoMedicoService
