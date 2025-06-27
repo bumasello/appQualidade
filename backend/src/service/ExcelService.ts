@@ -6,14 +6,46 @@ import type {
 } from "../type/excel";
 
 class ExcelService {
-  // Renomeado para ExcelProcessingService
-  /**
-   * processVinculoExcel
-   * Processa um buffer de arquivo Excel, valida cabeçalhos e mapeia dados para objetos tipados.
-   * @param buffer O buffer do arquivo Excel.
-   * @param requiredHeaders Uma lista de cabeçalhos que são obrigatórios na planilha.
-   * @returns Uma Promise que resolve para ExcelProcessingResult contendo os dados processados ou erros.
-   */
+  // Definir explicitamente todas as chaves da interface VinculoMedicoExcelRow
+  // Isso garante que temos acesso a elas em tempo de execução.
+  private readonly ALL_VINCULO_MEDICO_EXCEL_ROW_KEYS: (keyof VinculoMedicoExcelRow)[] =
+    [
+      "SISTEMA",
+      "UNIDADE",
+      "CONCAT",
+      "ESTABELECIMENTO",
+      "BIP_PROFISSIONAL",
+      "CHAVE_ORIGEM",
+      "PACIENTE",
+      "FUNCIONÁRIO",
+      "NOME",
+      "NOME_SOC",
+      "PARTICULARIDADE",
+      "NR_CPF",
+      "DT_NASC",
+      "VINCULO_MEDICO",
+      "NR_DOC_PROF",
+      "UF_DOCUMENTO",
+      "ESPECIALIDADE",
+      "MAE",
+      "NM_MAE_CACHE",
+      "PAI",
+      "MOTIVO_INVALIDO",
+      "CAMPO_INVALIDO",
+      "CONTEUDO_INVALIDO",
+      "CPF_UNIFICADO",
+      "DT_INVALIDO",
+      "CPF rec Federal",
+      "Nome Rec. Federal",
+      "Dt. Nasc. Rec. Federal",
+      "Nome conselho",
+      "Nº conselho",
+      "UF conselho",
+      "CONSELHO",
+      "ANALISE",
+      "AÇÃO",
+    ];
+
   public async processVinculoExcel(
     buffer: Buffer,
     requiredHeaders: string[],
@@ -44,8 +76,8 @@ class ExcelService {
       }
 
       const headers: string[] = rawData[0].map((h) => String(h).trim());
-      console.log("1. Cabeçalhos lidos da planilha (trim):", headers); // <-- NOVO LOG
-      console.log("2. Cabeçalhos requeridos:", requiredHeaders); // <-- NOVO LOG
+      console.log("1. Cabeçalhos lidos da planilha (trim):", headers);
+      console.log("2. Cabeçalhos requeridos:", requiredHeaders);
 
       const dataRows: (string | number | boolean | null)[][] = rawData.slice(1);
 
@@ -57,20 +89,19 @@ class ExcelService {
         console.log(
           "3. Cabeçalhos requeridos ausentes (se houver):",
           missingRequiredHeaders,
-        ); // <-- NOVO LOG
+        );
         throw new AppError(
           `Cabeçalhos obrigatórios ausentes na planilha: ${missingRequiredHeaders.join(", ")}.`,
           400,
         );
       }
 
-      const validExcelRowKeys = new Set(
-        Object.keys({} as VinculoMedicoExcelRow),
-      );
+      // Agora, usamos a lista explícita de chaves
+      const validExcelRowKeys = new Set(this.ALL_VINCULO_MEDICO_EXCEL_ROW_KEYS);
       console.log(
         "4. Chaves válidas na interface VinculoMedicoExcelRow:",
         Array.from(validExcelRowKeys),
-      ); // <-- NOVO LOG
+      ); // Agora não será vazio!
 
       dataRows.forEach(
         (row: (string | number | boolean | null)[], rowIndex: number) => {
@@ -79,13 +110,11 @@ class ExcelService {
           let mappedRow: Partial<VinculoMedicoExcelRow> = {};
 
           headers.forEach((headerName: string, colIndex: number) => {
+            // O headerName lido da planilha deve corresponder a uma chave da interface
             const propName = headerName as keyof VinculoMedicoExcelRow;
 
-            // A condição correta para atribuição é apenas verificar se a propriedade existe na interface
-            // A sua condição anterior era: propName in mappedRow || typeof mappedRow[propName] !== "undefined" || typeof ({} as VinculoMedicoExcelRow)[propName] !== "undefined"
-            // Que é equivalente a validExcelRowKeys.has(propName)
+            // Verifica se o nome do cabeçalho da planilha é uma propriedade válida na nossa interface
             if (validExcelRowKeys.has(propName)) {
-              // Use esta condição simplificada e correta
               const cellValue =
                 row[colIndex] !== undefined
                   ? String(row[colIndex]).trim()
@@ -97,7 +126,7 @@ class ExcelService {
           console.log(
             `5. Linha ${rowNum} - Objeto mapeado antes da validação de presença:`,
             mappedRow,
-          ); // <-- NOVO LOG
+          );
 
           requiredHeaders.forEach((requiredHeader) => {
             const propName = requiredHeader as keyof VinculoMedicoExcelRow;
@@ -106,7 +135,7 @@ class ExcelService {
               console.log(
                 `6. Erro na linha ${rowNum}: Valor ausente para "${requiredHeader}". Valor mapeado:`,
                 mappedRow[propName],
-              ); // <-- NOVO LOG
+              );
               rowErrors.push({
                 message: `${requiredHeader} é obrigatório.`,
                 column: requiredHeader,
@@ -138,11 +167,10 @@ class ExcelService {
         error instanceof AppError
           ? error.message
           : "Erro inesperado ao processar o ficheiro Excel.";
-      result.errors.push({ row: 0, message: result.message }); // Erro geral
-      result.failedCount = result.processedCount + result.failedCount; // Marca todas as linhas como falhas se for um erro geral
+      result.errors.push({ row: 0, message: result.message });
+      result.failedCount = result.processedCount + result.failedCount;
       result.processedCount = 0;
       result.data = [];
-      // IMPORTANTE: Retorna o objeto 'result' aqui também
       return result;
     }
   }
