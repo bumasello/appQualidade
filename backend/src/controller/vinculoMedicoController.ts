@@ -111,20 +111,16 @@ export class VinculoMedicoController {
           400,
         );
       }
-      const requiredHeaders = ["NR_DOC_PROF", "UF_DOCUMENTO", "NR_CPF"];
+      const requiredHeaders = ["Nº conselho", "UF conselho", "NR_CPF"];
 
       const excelProcessResult = await this.excelService.processVinculoExcel(
         req.file.buffer,
         requiredHeaders,
       );
-      if (
-        !excelProcessResult.success ||
-        !excelProcessResult.data ||
-        excelProcessResult.data.length === 0
-      ) {
+      if (excelProcessResult.data.length === 0) {
         throw new AppError(
           excelProcessResult.message ||
-            "Erro no processamento estrutural da planilha.",
+            "Nenhuma linha valida encontrada na planilha para processamento.",
           400,
           // excelProcessResult.errors,
         );
