@@ -37,7 +37,7 @@ const VinculoMedicoPage: React.FC = () => {
   // NOVO: Ref para o input de arquivo oculto
   const fileInputRef = useRef<HTMLInputElement>(null);
   // NOVO: Estado para o arquivo selecionado
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Função para resetar o formulário para o estado inicial de busca
   const resetForm = () => {
@@ -47,7 +47,7 @@ const VinculoMedicoPage: React.FC = () => {
     setNomeMedico("");
     setCpfVinculado("");
     setCardMode("search");
-    setSelectedFile(null); // Limpa o arquivo selecionado também
+    // setSelectedFile(null); // Limpa o arquivo selecionado também
     if (fileInputRef.current) {
       fileInputRef.current.value = ""; // Limpa o valor do input de arquivo
     }
@@ -136,7 +136,7 @@ const VinculoMedicoPage: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
+      // setSelectedFile(file);
       // Aqui você pode adicionar uma validação inicial do arquivo (tamanho, tipo)
       console.log("Arquivo selecionado:", file.name);
       // Opcional: Chamar a função de upload imediatamente após a seleção
@@ -151,44 +151,51 @@ const VinculoMedicoPage: React.FC = () => {
 
     // Simulação de upload para o backend
     // Você usaria FormData para enviar o arquivo:
-    // const formData = new FormData();
-    // formData.append('excelFile', file);
-    // try {
-    //   const response = await fetch('http://localhost:8080/vinculomedico/upload-lote', {
-    //     method: 'POST',
-    //     body: formData,
-    //   } );
-    //   if (!response.ok) {
-    //     const errorData = await response.json();
-    //     toast.error("Erro no upload", {
-    //       description: errorData.message || "Não foi possível processar a planilha.",
-    //     });
-    //     return;
-    //   }
-    //   const successData = await response.json();
-    //   toast.success("Upload em Lote Concluído!", {
-    //     description: successData.message || `Planilha ${file.name} processada com sucesso.`,
-    //     duration: 5000,
-    //   });
-    // } catch (error) {
-    //   console.error("Erro ao enviar arquivo em lote:", error);
-    //   toast.error("Erro de conexão", {
-    //     description: "Não foi possível conectar ao servidor para upload em lote.",
-    //   });
-    // } finally {
-    //   setIsBatchUploading(false);
-    //   resetForm(); // Opcional: resetar o formulário após o upload
-    // }
-
-    // Simulação atual:
-    setTimeout(() => {
+    const formData = new FormData();
+    formData.append("excelFile", file);
+    try {
+      const response = await fetch(
+        "http://localhost:8080/vinculomedico/vincularbatch",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error("Erro no upload", {
+          description:
+            errorData.message || "Não foi possível processar a planilha.",
+        });
+        return;
+      }
+      const successData = await response.json();
       toast.success("Upload em Lote Concluído!", {
-        description: `Planilha "${file.name}" processada com sucesso (simulado).`,
+        description:
+          successData.message ||
+          `Planilha ${file.name} processada com sucesso.`,
         duration: 5000,
       });
+    } catch (error) {
+      console.error("Erro ao enviar arquivo em lote:", error);
+      toast.error("Erro de conexão", {
+        description:
+          "Não foi possível conectar ao servidor para upload em lote.",
+      });
+    } finally {
       setIsBatchUploading(false);
-      resetForm(); // Reseta o formulário após o "upload"
-    }, 2000);
+      resetForm(); // Opcional: resetar o formulário após o upload
+    }
+
+    // Simulação atual:
+    // setTimeout(() => {
+    //   toast.success("Upload em Lote Concluído!", {
+    //     description: `Planilha "${file.name}" processada com sucesso (simulado).`,
+    //     duration: 5000,
+    //   });
+    //   setIsBatchUploading(false);
+    //   resetForm(); // Reseta o formulário após o "upload"
+    // }, 2000);
   };
 
   return (
