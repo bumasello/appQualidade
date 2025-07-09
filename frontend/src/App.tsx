@@ -11,7 +11,9 @@ export type AutomationKey =
   | "vinculo-medico"
   | "dashboard"
   | "configuracoes"
-  | "relatorios";
+  | "relatorios"
+  | "pacientes"
+  | "teste";
 
 function App() {
   const [selectedAutomation, setSelectedAutomation] =

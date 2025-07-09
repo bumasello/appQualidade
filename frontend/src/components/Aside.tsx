@@ -1,6 +1,13 @@
 // src/components/Aside.tsx
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,15 +15,11 @@ import {
   Settings,
   BarChart,
   Stethoscope,
+  FileUser,
+  TestTube,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { AsideListItem } from "./AsideListItem";
 
 import type { AutomationKey } from "../App";
 
@@ -50,7 +53,7 @@ const Aside: React.FC<AsideProps> = ({
         "transition-all duration-300 ease-in-out",
         isCollapsed ? "w-16" : "w-52",
         "ml-4 my-4 flex-shrink-0",
-        "hover:shadow-none",
+        "hover:shadow-none"
       )}
     >
       {/* Botão de Toggle */}
@@ -71,7 +74,7 @@ const Aside: React.FC<AsideProps> = ({
 
       <div className="flex-1 p-4 overflow-hidden">
         {!isCollapsed && (
-          <h2 className="text-xl font-semibold mb-4 whitespace-nowrap">
+          <h2 className="text-xl text-center font-semibold mb-4 whitespace-nowrap">
             Menu Principal
           </h2>
         )}
@@ -86,7 +89,7 @@ const Aside: React.FC<AsideProps> = ({
               selectedAutomation === "dashboard"
                 ? "bg-blue-600 text-white"
                 : !isCollapsed && "hover:bg-gray-700",
-              isCollapsed && "cursor-default",
+              isCollapsed && "cursor-default"
             )}
           >
             <LayoutDashboard className="h-5 w-5 shrink-0" />
@@ -95,7 +98,7 @@ const Aside: React.FC<AsideProps> = ({
                 "ml-3 whitespace-nowrap transition-all duration-300 ease-in-out",
                 isCollapsed
                   ? "w-0 opacity-0 overflow-hidden"
-                  : "w-auto opacity-100",
+                  : "w-auto opacity-100"
               )}
             >
               Dashboard
@@ -110,7 +113,7 @@ const Aside: React.FC<AsideProps> = ({
               selectedAutomation === "configuracoes"
                 ? "bg-blue-600 text-white"
                 : !isCollapsed && "hover:bg-gray-700",
-              isCollapsed && "cursor-default",
+              isCollapsed && "cursor-default"
             )}
           >
             <Settings className="h-5 w-5 shrink-0" />
@@ -119,7 +122,7 @@ const Aside: React.FC<AsideProps> = ({
                 "ml-3 whitespace-nowrap transition-all duration-300 ease-in-out",
                 isCollapsed
                   ? "w-0 opacity-0 overflow-hidden"
-                  : "w-auto opacity-100",
+                  : "w-auto opacity-100"
               )}
             >
               Configurações
@@ -134,7 +137,7 @@ const Aside: React.FC<AsideProps> = ({
               selectedAutomation === "relatorios"
                 ? "bg-blue-600 text-white"
                 : !isCollapsed && "hover:bg-gray-700",
-              isCollapsed && "cursor-default",
+              isCollapsed && "cursor-default"
             )}
           >
             <BarChart className="h-5 w-5 shrink-0" />
@@ -143,7 +146,7 @@ const Aside: React.FC<AsideProps> = ({
                 "ml-3 whitespace-nowrap transition-all duration-300 ease-in-out",
                 isCollapsed
                   ? "w-0 opacity-0 overflow-hidden"
-                  : "w-auto opacity-100",
+                  : "w-auto opacity-100"
               )}
             >
               Relatórios
@@ -157,7 +160,7 @@ const Aside: React.FC<AsideProps> = ({
               selectedAutomation === "vinculo-medico" && isCollapsed
                 ? "bg-blue-600 text-white"
                 : "",
-              isCollapsed && "cursor-default",
+              isCollapsed && "cursor-default"
             )}
           >
             <Stethoscope className="h-5 w-5 shrink-0" />
@@ -173,7 +176,7 @@ const Aside: React.FC<AsideProps> = ({
                   <AccordionTrigger
                     className={cn(
                       "flex justify-between items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
-                      "hover:bg-gray-700",
+                      "hover:bg-gray-700"
                     )}
                   >
                     <span className="whitespace-nowrap">Médicos</span>
@@ -188,7 +191,7 @@ const Aside: React.FC<AsideProps> = ({
                         "block p-2 rounded-xl whitespace-nowrap",
                         selectedAutomation === "vinculo-medico"
                           ? "bg-blue-600 text-white"
-                          : "hover:bg-gray-700",
+                          : "hover:bg-gray-700"
                       )}
                     >
                       Vínculo Médico
@@ -198,6 +201,88 @@ const Aside: React.FC<AsideProps> = ({
               </Accordion>
             )}
           </div>
+          {/* Item Pacientes */}
+          <div
+            className={cn(
+              "flex items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
+              selectedAutomation === "pacientes" && isCollapsed
+                ? "bg-blue-600 text-white"
+                : "",
+              isCollapsed && "cursor-default"
+            )}
+          >
+            <FileUser className="h-5 w-5 shrink-0" />
+            {!isCollapsed && (
+              <Accordion
+                type="single"
+                collapsible
+                value={openAccordionItem}
+                onValueChange={setOpenAccordionItem}
+                className="w-full ml-2"
+              >
+                <AccordionItem value="item-pacientes">
+                  <AccordionTrigger
+                    className={cn(
+                      "flex justify-between items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
+                      "hover:bg-gray-700"
+                    )}
+                  >
+                    <span className="whitespace-nowrap">Pacientes</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2 mt-2">
+                    <a
+                      href="#"
+                      type="button"
+                      onClick={() =>
+                        !isCollapsed && onSelectAutomation("pacientes")
+                      }
+                      className={cn(
+                        "block p-2 rounded-xl whitespace-nowrap",
+                        selectedAutomation === "pacientes"
+                          ? "bg-blue-600 text-white"
+                          : "hover:bg-gray-700"
+                      )}
+                    >
+                      Curadoria
+                    </a>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
+          </div>
+          {/* Item Teste */}
+
+          <AsideListItem
+            icon={TestTube}
+            label="Teste"
+            onSelectAutomation={onSelectAutomation}
+            selectedAutomation={selectedAutomation}
+            isCollapsed={isCollapsed}
+            accordionValue="item-teste"
+            onAccordionValueChange={setOpenAccordionItem}
+            accordionSubItemsKeys={["teste"]}
+            currentAccordionValue={openAccordionItem}
+            accordionContent={
+              <div className="space-y-2">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onSelectAutomation("teste")}
+                  // onKeyDown={(e) =>
+                  //   e.key === "Enter" && onSelectAutomation("teste")
+                  // }
+                  className={cn(
+                    "block p-2 rounded-xl whitespace-nowrap",
+                    selectedAutomation === "teste"
+                      ? "bg-blue-600 text-white"
+                      : "hover:bg-gray-700"
+                  )}
+                >
+                  Curadoria
+                </div>
+              </div>
+            }
+          ></AsideListItem>
         </nav>
       </div>
     </aside>
