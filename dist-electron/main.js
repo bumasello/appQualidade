@@ -50,6 +50,8 @@ function startBackend() {
   });
 }
 function createWindow() {
+  const iconPath = path.join(__dirname, "../../template/build/favicon.ico");
+  console.log(`DEBUG: Caminho do \xEDcone: ${iconPath}`);
   const win = new BrowserWindow({
     width: 1024,
     height: 768,
@@ -57,7 +59,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
-    }
+    },
+    icon: iconPath
   });
   win.loadFile(path.join(__dirname, "../frontend/dist/index.html"));
 }

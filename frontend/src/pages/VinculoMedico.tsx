@@ -104,7 +104,7 @@ const VinculoMedicoPage: React.FC = () => {
   };
 
   // Função para simular o vínculo do médico (substituirá o fetch POST real)
-  const handleRealizarVinculo = () => {
+  const handleRealizarVinculo = async () => {
     if (!cpfVinculado && !cpf) {
       toast.error("Preenchimento obrigatório", {
         description: "Por favor, informe o CPF para vincular.",
@@ -118,13 +118,48 @@ const VinculoMedicoPage: React.FC = () => {
       }`
     );
 
-    toast.success("Vínculo Realizado!", {
-      description: `O médico ${nomeMedico} foi vinculado ao CPF ${
-        cpfVinculado || cpf
-      }.`,
-      duration: 3000,
-    });
-    resetForm();
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `http://localhost:8080/vinculomedico/vincular`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            crm,
+            uf,
+            cpf,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error("Erro na busca", {
+          description:
+            errorData.message ||
+            "Não foi possível encontrar o médico. Verifique o CRM e a UF.",
+        });
+        return;
+      }
+
+      toast.success("Vínculo Realizado!", {
+        description: `O médico ${nomeMedico} foi vinculado ao CPF ${
+          cpfVinculado || cpf
+        }.`,
+        duration: 3000,
+      });
+      resetForm();
+    } catch (error) {
+      console.error("Erro ao vincular médico:", error);
+      toast.error("Erro inesperado", {
+        description: "Ocorreu um erro ao tentar vincular o médico.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // NOVO: Função para disparar o clique no input de arquivo oculto

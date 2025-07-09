@@ -64,6 +64,9 @@ function startBackend() {
 }
 
 function createWindow() {
+  const iconPath = path.join(__dirname, "../../template/build/favicon.ico");
+  console.log(`DEBUG: Caminho do ícone: ${iconPath}`);
+
   const win = new BrowserWindow({
     width: 1024,
     height: 768,
@@ -72,6 +75,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    icon: iconPath,
   });
 
   // Agora __dirname estará definido
