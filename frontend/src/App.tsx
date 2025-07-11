@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/sonner"; // Importe o Toaster
 export type AutomationKey =
   | "home"
   | "vinculo-medico"
+  | "curadoria-prf-saude"
+  | "curadoria-pacientes"
   | "dashboard"
   | "configuracoes"
   | "relatorios"

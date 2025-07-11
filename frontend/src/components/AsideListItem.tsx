@@ -5,9 +5,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { AsideListItemContent } from "./AsideListItemContent";
 
 import type { AutomationKey } from "@/App";
 import type { LucideIcon } from "lucide-react";
+import type { SubItem } from "@/types/navigation";
 
 interface AsideListItemProps {
   icon: LucideIcon;
@@ -19,7 +21,7 @@ interface AsideListItemProps {
   accordionValue: string;
   currentAccordionValue: string | undefined;
   onAccordionValueChange?: (value: string | undefined) => void;
-  accordionSubItemsKeys: AutomationKey[];
+  subItems: SubItem[];
 }
 
 export const AsideListItem: React.FC<AsideListItemProps> = ({
@@ -27,15 +29,16 @@ export const AsideListItem: React.FC<AsideListItemProps> = ({
   label,
   selectedAutomation,
   isCollapsed,
-  accordionContent,
+  onSelectAutomation,
   accordionValue,
   onAccordionValueChange,
-  accordionSubItemsKeys,
+  subItems,
   currentAccordionValue,
 }) => {
-  const isAccordionParentSelected = accordionSubItemsKeys.some(
-    (key) => selectedAutomation === key
+  const isAccordionParentSelected = subItems.some(
+    (key) => selectedAutomation === key.automationKey,
   );
+
   return (
     <div
       className={cn(
@@ -43,7 +46,7 @@ export const AsideListItem: React.FC<AsideListItemProps> = ({
         isCollapsed && isAccordionParentSelected
           ? "bg-blue-600 text-white"
           : "",
-        isCollapsed && "cursor-default"
+        isCollapsed && "cursor-default",
       )}
     >
       <Icon className="h-5 w-5 shrink-0" />
@@ -59,13 +62,21 @@ export const AsideListItem: React.FC<AsideListItemProps> = ({
             <AccordionTrigger
               className={cn(
                 "flex items-center justify-between w-full p-2 rounded-xl cursor-pointer transition-all duration-300 ease-in-out",
-                !isCollapsed && isAccordionParentSelected ? "bg-gray-700" : ""
+                !isCollapsed && isAccordionParentSelected ? "bg-gray-700" : "",
               )}
             >
               <span className="whitespace-nowrap">{label}</span>
             </AccordionTrigger>
             <AccordionContent className="space-y-2 mt-2">
-              {accordionContent}
+              {subItems.map((item) => (
+                <AsideListItemContent
+                  key={item.automationKey}
+                  label={item.label}
+                  automationKey={item.automationKey}
+                  onSelectAutomation={onSelectAutomation}
+                  selectedAutomation={selectedAutomation}
+                />
+              ))}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
