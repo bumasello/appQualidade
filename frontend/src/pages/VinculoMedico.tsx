@@ -36,8 +36,6 @@ const VinculoMedicoPage: React.FC = () => {
   const [isBatchUploading, setIsBatchUploading] = useState(false);
   // NOVO: Ref para o input de arquivo oculto
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // NOVO: Estado para o arquivo selecionado
-  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Função para resetar o formulário para o estado inicial de busca
   const resetForm = () => {
@@ -70,7 +68,7 @@ const VinculoMedicoPage: React.FC = () => {
         `http://localhost:8080/vinculomedico/buscar?crm=${crm}&uf=${uf}`,
         {
           method: "GET",
-        }
+        },
       );
 
       if (!response.ok) {
@@ -115,7 +113,7 @@ const VinculoMedicoPage: React.FC = () => {
     console.log(
       `Realizando vínculo para CRM: ${crm}, UF: ${uf}, CPF: ${
         cpfVinculado || cpf
-      }`
+      }`,
     );
 
     setIsLoading(true);
@@ -132,7 +130,7 @@ const VinculoMedicoPage: React.FC = () => {
             uf,
             cpf,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -194,7 +192,7 @@ const VinculoMedicoPage: React.FC = () => {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
       if (!response.ok) {
         const errorData = await response.json();

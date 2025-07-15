@@ -5,6 +5,7 @@ import redeDorLogo from "./assets/RDOR3.SA_BIG.png";
 
 import VinculoMedicoPage from "./pages/VinculoMedico";
 import { Toaster } from "@/components/ui/sonner"; // Importe o Toaster
+import CuradoriaPacientes from "./pages/CuradoriaPacientes";
 
 export type AutomationKey =
   | "home"
@@ -25,7 +26,7 @@ function App() {
     switch (selectedAutomation) {
       case "home":
         return (
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center h-full">
             <img
               src={redeDorLogo}
               alt="Logo Rede D'Or São Luiz"
@@ -41,6 +42,8 @@ function App() {
         );
       case "vinculo-medico":
         return <VinculoMedicoPage />;
+      case "curadoria-pacientes":
+        return <CuradoriaPacientes />;
       case "dashboard":
         return (
           <div className="flex flex-col items-center justify-center h-full">
@@ -88,7 +91,8 @@ function App() {
         >
           <div
             key={selectedAutomation}
-            className="animate-fade-in flex flex-col items-center justify-center h-full"
+            // className="animate-fade-in flex flex-col items-center justify-center h-full"
+            className="animate-fade-in h-full"
           >
             {renderMainContent()}
           </div>
@@ -100,7 +104,6 @@ function App() {
         richColors // Adiciona cores ricas para diferentes tipos de toast (success, error, warning, info)
         position="bottom-right" // Posição do toast na tela
       />{" "}
-      {/* Adicione o Toaster aqui, geralmente no final do App */}
     </div>
   );
 }

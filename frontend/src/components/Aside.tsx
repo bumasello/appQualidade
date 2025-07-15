@@ -64,7 +64,7 @@ const Aside: React.FC<AsideProps> = ({
           variant="secondary"
           size="icon"
           onClick={toggleCollapse}
-          className="rounded-full shadow-lg"
+          className="rounded-full bg-gray-900 hover:bg-blue-600 shadow-lg"
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -90,7 +90,7 @@ const Aside: React.FC<AsideProps> = ({
             onSelectAutomation={onSelectAutomation}
             selectedAutomation={selectedAutomation}
             isCollapsed={isCollapsed}
-            accordionValue="item-pacientes"
+            accordionValue="item-prf-saude"
             currentAccordionValue={openAccordionItem}
             onAccordionValueChange={setOpenAccordionItem}
             subItems={prfSaudeSubItems}
