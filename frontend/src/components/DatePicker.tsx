@@ -24,48 +24,41 @@ export function DatePicker({ placeholder }: DatePickerProps) {
 
   // Função para formatar e validar a entrada de data
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
+    let value = e.target.value.replace(/\D/g, ""); // Remove não-dígitos
 
-    // 1. Remove tudo que não for dígito
-    value = value.replace(/\D/g, "");
-
-    // 2. Adiciona as barras automaticamente
+    // Adiciona a primeira barra
     if (value.length > 2) {
       value = `${value.slice(0, 2)}/${value.slice(2)}`;
     }
+    // Adiciona a segunda barra
     if (value.length > 5) {
       value = `${value.slice(0, 5)}/${value.slice(5)}`;
     }
 
-    // 3. Limita o comprimento total
-    if (value.length > 10) {
-      value = value.slice(0, 10);
-    }
+    // Limita o comprimento total a 10 caracteres (dd/MM/yyyy)
+    value = value.slice(0, 10);
 
-    // 4. Atualiza o estado do input
     setInputValue(value);
 
-    // 5. Tenta parsear e atualizar a data principal se o formato estiver completo
+    // Tenta parsear e atualizar a data principal se o formato estiver completo
     if (value.length === 10) {
       const parsedDate = parse(value, "dd/MM/yyyy", new Date());
       if (isValid(parsedDate)) {
         setDate(parsedDate);
       }
     } else {
-      // Se o usuário está apagando, limpa a data selecionada
       setDate(undefined);
     }
   };
-
   // Efeito para atualizar o input quando a data é selecionada no calendário
-  React.useEffect(() => {
-    if (date) {
-      setInputValue(format(date, "dd/MM/yyyy"));
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate);
+    if (selectedDate) {
+      setInputValue(format(selectedDate, "dd/MM/yyyy"));
     } else {
-      // Se a data for limpa, limpa o input também
       setInputValue("");
     }
-  }, [date]);
+  };
 
   return (
     <Popover>
@@ -73,11 +66,17 @@ export function DatePicker({ placeholder }: DatePickerProps) {
         <Button
           variant={"outline"}
           className={cn(
-            "bg-gray-800 w-full justify-start text-left font-normal",
+            // --- Estilos Base ---
+            "w-full justify-start text-left font-normal",
+            "bg-gray-800 border-transparent", // Fundo cinza, borda transparente por padrão
+            "hover:bg-gray-800 border-gray-700", // Borda cinza sutil no hover
+            // --- Estilos de Foco ---
+            "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900",
+            // --- Estilo quando não há data ---
             !date && "text-muted-foreground",
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon className="mr-1 h-4 w-4" />
           {date ? (
             format(date, "dd/MM/yyyy")
           ) : (
@@ -85,8 +84,8 @@ export function DatePicker({ placeholder }: DatePickerProps) {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <div className="p-4 space-y-2">
+      <PopoverContent className="w-auto p1">
+        <div className="p-3 space-y-2">
           <Label htmlFor="date-input">Entrada Manual</Label>
           <Input
             id="date-input"
@@ -99,7 +98,7 @@ export function DatePicker({ placeholder }: DatePickerProps) {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={handleDateSelect}
           initialFocus
         />
       </PopoverContent>

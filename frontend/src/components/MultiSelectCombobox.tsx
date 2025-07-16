@@ -55,7 +55,9 @@ function MultiSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("bg-gray-800 w-full justify-between h-10")} // Altura fixa para consistência
+          className={cn(
+            "bg-gray-800 border-gray-700 w-full justify-between h-10",
+          )} // Altura fixa para consistência
           onClick={() => setOpen(!open)}
         >
           <div className="flex gap-1 flex-wrap items-center">
