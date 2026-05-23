@@ -4,6 +4,7 @@ node_modules
 resources
 release
 dist-electron/
+dist/
 backend/dist/
 .claude/
 backend/.env

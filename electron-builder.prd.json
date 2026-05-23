@@ -1,8 +1,8 @@
 {
   "extraResources": [
     {
-      "from": "resources/instantclient_19_6",
-      "to": "instantclient_19_6",
+      "from": "resources/instantclient_19_30",
+      "to": "instantclient_19_30",
       "filter": ["**/*"]
     },
     {
