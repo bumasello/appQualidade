@@ -25,7 +25,7 @@ export const AsideListItemContent: React.FC<AsideListItemContentProps> = ({
           e.key === "Enter" && onSelectAutomation(automationKey)
         }
         className={cn(
-          "block p-2 rounded-xl whitespace-nowrap",
+          "block p-2 rounded-xl",
           selectedAutomation === automationKey
             ? "bg-blue-600 text-white"
             : "hover:bg-gray-700",

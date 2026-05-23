@@ -1,0 +1,26 @@
+{
+  "appId": "com.rededor.appqualidade.hml",
+  "productName": "App Qualidade HML",
+  "publish": {
+    "channel": "beta"
+  },
+  "extraResources": [
+    {
+      "from": "resources/instantclient_19_6",
+      "to": "instantclient_19_6",
+      "filter": ["**/*"]
+    },
+    {
+      "from": ".env.hml",
+      "to": ".env.app"
+    }
+  ],
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "App Qualidade HML"
+  }
+}

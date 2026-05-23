@@ -1,0 +1,13 @@
+{
+  "extraResources": [
+    {
+      "from": "resources/instantclient_19_6",
+      "to": "instantclient_19_6",
+      "filter": ["**/*"]
+    },
+    {
+      "from": ".env.prd",
+      "to": ".env.app"
+    }
+  ]
+}

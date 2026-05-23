@@ -6,16 +6,23 @@
   "main": "dist-electron/main.js",
   "type": "module",
   "scripts": {
-    "build:electron": "esbuild electron/main.ts --bundle --platform=node --external:electron --outfile=dist-electron/main.js --format=esm",
+    "build:electron": "esbuild electron/main.ts --bundle --platform=node --external:electron --external:electron-updater --outfile=dist-electron/main.js --format=esm",
     "build:react": "cd frontend && bun run build",
     "build:backend": "cd backend && bunx tsc",
     "dev:electron": "bun run build:electron && bun run build:react && bun run build:backend && electron dist-electron/main.js",
     "dev:react": "cd frontend && bun run dev",
     "dev:backend": "cd backend && bun run dev",
     "build": "bun run build:electron && bun run build:react && bun run build:backend",
-    "dist": "bun run build && electron-builder --windows"
+    "dist": "bun run build && electron-builder --windows",
+    "dist:prd": "bun run build && electron-builder --windows --config electron-builder.prd.json --publish always",
+    "dist:hml": "bun run build && electron-builder --windows --config electron-builder.hml.json --publish always"
   },
-  "dependencies": {},
+  "dependencies": {
+    "baseline-browser-mapping": "^2.10.32",
+    "caniuse-lite": "^1.0.30001793",
+    "dotenv": "^17.4.2",
+    "electron-updater": "^6.8.3"
+  },
   "devDependencies": {
     "electron": "^31.0.9",
     "electron-builder": "^26.0.12",
@@ -27,21 +34,17 @@
     "directories": {
       "output": "release"
     },
+    "publish": {
+      "provider": "github",
+      "owner": "bumasello",
+      "repo": "appqualidade"
+    },
     "files": [
       "dist-electron/**/*",
       "frontend/dist/**/*",
       "backend/dist/**/*",
       "resources/**/*",
       "package.json"
-    ],
-    "extraResources": [
-      {
-        "from": "resources/instantclient_19_6",
-        "to": "instantclient_19_6",
-        "filter": [
-          "**/*"
-        ]
-      }
     ],
     "win": {
       "target": [

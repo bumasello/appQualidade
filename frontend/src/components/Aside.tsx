@@ -2,18 +2,14 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+
 import {
   ChevronLeft,
   ChevronRight,
   Stethoscope,
   FileUser,
   TestTube,
+  Hammer,
 } from "lucide-react";
 
 import { AsideListItem } from "./AsideListItem";
@@ -21,6 +17,7 @@ import {
   pacienteSubItems,
   prfSaudeSubItems,
   testSubItems,
+  utilitariosSubItems,
 } from "@/config/asideNavigation";
 
 import type { AutomationKey } from "../App";
@@ -35,9 +32,7 @@ const Aside: React.FC<AsideProps> = ({
   selectedAutomation,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [openAccordionItem, setOpenAccordionItem] = useState<
-    string | undefined
-  >(undefined);
+  const [openAccordionItem, setOpenAccordionItem] = useState<string>("");
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -64,7 +59,7 @@ const Aside: React.FC<AsideProps> = ({
           variant="secondary"
           size="icon"
           onClick={toggleCollapse}
-          className="rounded-full bg-gray-900 hover:bg-blue-600 shadow-lg"
+          className="rounded-full bg-gray-900 hover:bg-blue-600 shadow-lg ring-1 ring-white"
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -107,6 +102,17 @@ const Aside: React.FC<AsideProps> = ({
             onAccordionValueChange={setOpenAccordionItem}
             subItems={pacienteSubItems}
           />
+          <AsideListItem
+            icon={Hammer}
+            label="Utilitários"
+            onSelectAutomation={onSelectAutomation}
+            selectedAutomation={selectedAutomation}
+            isCollapsed={isCollapsed}
+            accordionValue="item-utilitario"
+            currentAccordionValue={openAccordionItem}
+            onAccordionValueChange={setOpenAccordionItem}
+            subItems={utilitariosSubItems}
+          ></AsideListItem>
           {/* Item Teste */}
           <AsideListItem
             icon={TestTube}

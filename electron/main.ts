@@ -1,18 +1,62 @@
+import dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
 
-import { app, BrowserWindow } from "electron";
+import { autoUpdater } from "electron-updater";
+
+import { app, BrowserWindow, dialog } from "electron";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { spawn, ChildProcess } from "child_process";
 
-// Obtenha o caminho do diretório atual em ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const APP_ENV = process.env.APP_ENV ?? "prd";
+const envFile = app.isPackaged
+  ? path.join(process.resourcesPath, ".env.app")
+  : path.join(__dirname, `../.env.${process.env.APP_ENV ?? "prd"}`);
+
+dotenv.config({ path: envFile });
 
 let backendProcess: ChildProcess | null = null;
 
 const backendPort: number = 8080;
+
+function setupAutoUpdater(win: BrowserWindow) {
+  autoUpdater.autoDownload = false;
+
+  autoUpdater.on("update-available", (info) => {
+    dialog
+      .showMessageBox(win, {
+        type: "info",
+        title: "Atualização Disponível",
+        message: `Versão ${info.version} disponível. Deseja baixar agora?`,
+        buttons: ["Baixar", "Depois"],
+      })
+      .then(({ response }) => {
+        if (response == 0) autoUpdater.downloadUpdate();
+      });
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    dialog
+      .showMessageBox(win, {
+        type: "info",
+        title: "Atualização Pronta",
+        message: `A atualização foi baixada. O app será reiniciado para instalar. Deseja reiniciar agora?`,
+        buttons: ["Reiniciar agora", "Depois"],
+      })
+      .then(({ response }) => {
+        if (response == 0) autoUpdater.quitAndInstall();
+      });
+  });
+
+  autoUpdater.on("error", (err) => {
+    console.error("Erro no auto-updater: ", err);
+  });
+
+  autoUpdater.checkForUpdates().catch(console.error);
+}
 
 function startBackend() {
   const backendPath = path.join(__dirname, "../backend/dist/server.js");
@@ -20,7 +64,7 @@ function startBackend() {
   console.log(`Iniciando o backend: ${backendPath}`);
   if (!fs.existsSync(backendPath)) {
     console.error(
-      `Erro: Ficheiro do backend não encontrado em ${backendPath}. Certifique-se de que 'bun run build:backend' foi executado.`
+      `Erro: Ficheiro do backend não encontrado em ${backendPath}. Certifique-se de que 'bun run build:backend' foi executado.`,
     );
     app.quit();
     return;
@@ -28,18 +72,17 @@ function startBackend() {
 
   let instantClientPath: string;
   if (app.isPackaged) {
-    // Em produção (app empacotada)
-    instantClientPath = path.join(process.resourcesPath, "instantclient_19_6");
+    instantClientPath = path.join(process.resourcesPath, "instantclient_19_30");
   } else {
-    instantClientPath = path.join(__dirname, "../resources/instantclient_19_6"); // <--- CORREÇÃO AQUI
+    instantClientPath = path.join(
+      __dirname,
+      "../resources/instantclient_19_30",
+    );
   }
-
-  console.log(`DEBUG: __dirname é: ${__dirname}`); // Adicione este log
-  console.log(`DEBUG: instantClientPath calculado é: ${instantClientPath}`); // Adicione este log
 
   if (!fs.existsSync(instantClientPath)) {
     console.error(
-      `Erro: Instant Client não encontrado em ${instantClientPath}.`
+      `Erro: Instant Client não encontrado em ${instantClientPath}.`,
     );
     app.quit();
     return;
@@ -65,7 +108,6 @@ function startBackend() {
 
 function createWindow() {
   const iconPath = path.join(__dirname, "../../template/build/favicon.ico");
-  console.log(`DEBUG: Caminho do ícone: ${iconPath}`);
 
   const win = new BrowserWindow({
     width: 1024,
@@ -78,12 +120,17 @@ function createWindow() {
     icon: iconPath,
   });
 
-  // Agora __dirname estará definido
   win.loadFile(path.join(__dirname, "../frontend/dist/index.html"));
+
+  return win;
 }
 
 app.whenReady().then(() => {
-  startBackend(), createWindow();
+  startBackend();
+  const win = createWindow();
+  if (app.isPackaged) {
+    setupAutoUpdater(win);
+  }
 });
 
 app.on("window-all-closed", () => {

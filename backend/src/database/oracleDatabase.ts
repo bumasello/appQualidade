@@ -25,7 +25,7 @@ class OracleDatabase {
       this.pool = await oracledb.createPool({
         user: "mdm_usr",
         password: "mdmusr123",
-        connectString: "10.243.3.23:1521/MDMFOHML",
+        connectString: "scan-eqn01.rededor.corp/SERV_PRDINFOS",
         poolMin: 5,
         poolMax: 20,
         poolIncrement: 5,

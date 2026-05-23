@@ -1,4 +1,9 @@
 node_modules
-.env
+.env.prd
+.env.hml
 resources
 release
+dist-electron/
+backend/dist/
+.claude/
+backend/.env

@@ -9,6 +9,10 @@ export const pacienteSubItems: SubItem[] = [
   { label: "Curadoria", automationKey: "curadoria-pacientes" },
 ];
 
+export const utilitariosSubItems: SubItem[] = [
+  { label: "Comparador de Planilhas", automationKey: "comparador-planilhas" },
+];
+
 export const testSubItems: SubItem[] = [
   { label: "Sub-item Teste", automationKey: "teste" },
 ];

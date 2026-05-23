@@ -48,7 +48,7 @@ class ExcelService {
 
   public async processVinculoExcel(
     buffer: Buffer,
-    requiredHeaders: string[]
+    requiredHeaders: string[],
   ): Promise<ExcelProcessingResult> {
     const result: ExcelProcessingResult = {
       success: true,
@@ -82,7 +82,7 @@ class ExcelService {
       const dataRows: (string | number | boolean | null)[][] = rawData.slice(1);
 
       const missingRequiredHeaders = requiredHeaders.filter(
-        (h) => !headers.includes(h)
+        (h) => !headers.includes(h),
       );
 
       if (missingRequiredHeaders.length > 0) {
@@ -92,9 +92,9 @@ class ExcelService {
         // );
         throw new AppError(
           `Cabeçalhos obrigatórios ausentes na planilha: ${missingRequiredHeaders.join(
-            ", "
+            ", ",
           )}.`,
-          400
+          400,
         );
       }
 
@@ -155,7 +155,7 @@ class ExcelService {
             result.processedCount++;
             result.data.push(mappedRow as VinculoMedicoExcelRow);
           }
-        }
+        },
       );
 
       if (result.failedCount > 0) {
@@ -175,6 +175,36 @@ class ExcelService {
       result.data = [];
       return result;
     }
+  }
+
+  public readSheetAsMap(buffer: Buffer): {
+    headers: string[];
+    rows: Record<string, string | null>[];
+  } {
+    const workbook = xlsx.read(buffer, { type: "buffer" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    if (!sheet) throw new AppError("Planilha sem dados na primeira aba!", 400);
+
+    const raw = xlsx.utils.sheet_to_json<(string | number | boolean | null)[]>(
+      sheet,
+      { header: 1 },
+    );
+    if (raw.length === 0) throw new AppError("Planilha vazia!", 400);
+
+    const headers = (raw[0] as (string | null)[]).map((h) =>
+      String(h ?? "").trim(),
+    );
+    const rows = raw.slice(1).map((row) => {
+      const record: Record<string, string | null> = {};
+      headers.forEach((h, idx) => {
+        const val = (row as (string | number | boolean | null)[])[idx];
+        record[h] = val != null ? String(val).trim() : null;
+      });
+
+      return record;
+    });
+
+    return { headers, rows };
   }
 }
 

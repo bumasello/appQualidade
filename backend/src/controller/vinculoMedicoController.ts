@@ -1,6 +1,6 @@
 import { AppError } from "../error/appError";
-import VinculoMedicoService from "../service/vinculoMedService"; // Importa a instância
-import ExcelService from "../service/ExcelService"; // Importa a instância
+import VinculoMedicoService from "../service/prf_saude.service"; // Importa a instância
+import ExcelService from "../service/excel.service"; // Importa a instância
 
 import type { Request, Response, NextFunction } from "express";
 
@@ -16,7 +16,7 @@ export class VinculoMedicoController {
   public vinculaMedico = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const { crm, uf, cpf } = req.body;
@@ -24,14 +24,14 @@ export class VinculoMedicoController {
       if (!crm || !uf || !cpf) {
         throw new AppError(
           "[vinculaMedico] Todos os campos são obrigatórios!",
-          422
+          422,
         );
       }
 
       const result = await this.vinculoMedicoService.realizaVinculoMedico(
         crm,
         uf,
-        cpf
+        cpf,
       );
 
       if (result.success) {
@@ -49,7 +49,7 @@ export class VinculoMedicoController {
   public buscaMedico = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const { crm, uf } = req.query;
@@ -59,7 +59,7 @@ export class VinculoMedicoController {
       if (!crm || !uf) {
         throw new AppError(
           "[buscaMedico] Todos os campos são obrigatórios!",
-          422
+          422,
         );
       }
 
@@ -88,7 +88,7 @@ export class VinculoMedicoController {
 
       const result = await this.vinculoMedicoService.buscaMedico(
         crmValue,
-        ufValue
+        ufValue,
       );
 
       if (result.success) {
@@ -104,13 +104,13 @@ export class VinculoMedicoController {
   public vinculaMedicoBatch = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       if (!req.file || !req.file.buffer) {
         throw new AppError(
           "Nenhum ficheiro Excel foi enviado ou o ficheiro está vazio.",
-          400
+          400,
         );
       }
 
@@ -121,7 +121,7 @@ export class VinculoMedicoController {
       // 1. Processamento estrutural do Excel pelo ExcelService
       const excelProcessResult = await this.excelService.processVinculoExcel(
         req.file.buffer,
-        requiredHeaders
+        requiredHeaders,
       );
 
       // Se NENHUMA linha válida foi extraída do Excel, então é um erro que impede o processamento.
@@ -130,7 +130,7 @@ export class VinculoMedicoController {
         throw new AppError(
           excelProcessResult.message ||
             "Nenhuma linha válida encontrada na planilha para processamento.",
-          400 // Bad Request, pois o ficheiro não continha dados processáveis
+          400, // Bad Request, pois o ficheiro não continha dados processáveis
         );
       }
       // console.log(excelProcessResult.data);
@@ -143,7 +143,7 @@ export class VinculoMedicoController {
       // Corrigido o typo 'processaVinculoMedicoBatch' para 'processVinculoMedicoBatch'
       const batchProcessResult =
         await this.vinculoMedicoService.processaVinculoMedicoBatch(
-          excelProcessResult.data
+          excelProcessResult.data,
         );
 
       // Agora, construímos uma mensagem de resposta abrangente que inclui todos os resultados.
@@ -152,18 +152,18 @@ export class VinculoMedicoController {
 
       if (batchProcessResult.successfulUpdates > 0) {
         finalMessageParts.push(
-          `${batchProcessResult.successfulUpdates} vínculos atualizados com sucesso.`
+          `${batchProcessResult.successfulUpdates} vínculos atualizados com sucesso.`,
         );
       }
       if (batchProcessResult.failedUpdates > 0) {
         finalMessageParts.push(
-          `${batchProcessResult.failedUpdates} vínculos falharam na atualização.`
+          `${batchProcessResult.failedUpdates} vínculos falharam na atualização.`,
         );
         overallSuccess = false; // Se houve falhas no DB/negócio, o sucesso geral é parcial ou falho
       }
       if (excelProcessResult.failedCount > 0) {
         finalMessageParts.push(
-          `${excelProcessResult.failedCount} linhas foram ignoradas devido a erros estruturais.`
+          `${excelProcessResult.failedCount} linhas foram ignoradas devido a erros estruturais.`,
         );
         overallSuccess = false; // Se houve falhas estruturais, o sucesso geral é parcial ou falho
       }

@@ -19,8 +19,8 @@ interface AsideListItemProps {
   isCollapsed: boolean;
   accordionContent?: React.ReactNode;
   accordionValue: string;
-  currentAccordionValue: string | undefined;
-  onAccordionValueChange?: (value: string | undefined) => void;
+  currentAccordionValue: string;
+  onAccordionValueChange?: (value: string) => void;
   subItems: SubItem[];
 }
 
@@ -43,13 +43,16 @@ export const AsideListItem: React.FC<AsideListItemProps> = ({
     <div
       className={cn(
         "flex items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
-        isCollapsed && isAccordionParentSelected
-          ? "bg-blue-600 text-white"
-          : "",
+        isCollapsed && isAccordionParentSelected ? " text-white" : "",
         isCollapsed && "cursor-default",
       )}
     >
-      <Icon className="h-5 w-5 shrink-0" />
+      <Icon
+        className={cn(
+          "h-5 w-5 shrink-0",
+          isCollapsed && isAccordionParentSelected && "text-blue-400",
+        )}
+      />
       {!isCollapsed && (
         <Accordion
           type="single"

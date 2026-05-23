@@ -7,8 +7,15 @@ html, body, #root {
 }
 
 ::-webkit-scrollbar {
-  width: 0;  /* Para barras de rolagem verticais */
-  height: 0; /* Para barras de rolagem horizontais */
-  background: transparent; /* Opcional: torna o fundo da barra transparente */
+  width: 6px;
+  height: 6px;
 }
 
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(75, 85, 99); /* gray-600 */
+  border-radius: 3px;
+}

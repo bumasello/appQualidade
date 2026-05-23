@@ -1,5 +1,9 @@
+import { config } from "dotenv";
+import { join } from "path";
 import App from "./App";
 import OracleDatabase from "./database/oracleDatabase";
+
+config({ path: join(__dirname, "../.env") });
 
 const app = new App(8080);
 
