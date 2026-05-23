@@ -2,6 +2,9 @@
   "appId": "com.rededor.appqualidade.hml",
   "productName": "App Qualidade HML",
   "publish": {
+    "provider": "github",
+    "owner": "bumasello",
+    "repo": "appQualidade",
     "channel": "beta"
   },
   "extraResources": [
