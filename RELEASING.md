@@ -37,6 +37,8 @@ git commit -m "feat: descrição"
 git checkout hml
 git merge dev-nome-da-feature
 npm version prerelease --preid=beta   # ex: 1.1.0 → 1.1.1-beta.0
+git push
+git push --tags
 bun run dist:hml
 ```
 
@@ -48,6 +50,8 @@ git merge dev-nome-da-feature
 npm version patch    # correção de bug:     1.1.0 → 1.1.1
 # ou
 npm version minor    # nova funcionalidade: 1.1.0 → 1.2.0
+git push
+git push --tags
 bun run dist:prd
 ```
 
