@@ -52,7 +52,7 @@ function setupAutoUpdater(win: BrowserWindow) {
   autoUpdater.checkForUpdates().catch(console.error);
 }
 
-function startBackend() {
+function startBackend(logPath: string) {
   const backendPath = app.isPackaged
     ? path.join(
         process.resourcesPath,
@@ -96,6 +96,7 @@ function startBackend() {
       PORT: backendPort.toString(),
       ORACLE_CLIENT_LIB_DIR: instantClientPath,
       NODE_PATH: app.isPackaged ? process.resourcesPath : undefined,
+      LOG_FILE: logPath,
     },
   });
 
@@ -105,6 +106,15 @@ function startBackend() {
 
   backendProcess.on("exit", (code) => {
     console.log(`Backend encerrado com código: ${code}`);
+    if (code !== 0) {
+      let msg = `Código de saída: ${code}\nLog: ${logPath}`;
+      try {
+        msg = fs.readFileSync(logPath, "utf-8");
+      } catch {
+        // log ainda não existe ou não pôde ser lido
+      }
+      dialog.showErrorBox("Erro ao iniciar o backend", msg);
+    }
   });
 }
 
@@ -128,7 +138,8 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  startBackend();
+  const logPath = path.join(app.getPath("userData"), "backend.log");
+  startBackend(logPath);
   const win = createWindow();
   if (app.isPackaged) {
     setupAutoUpdater(win);
