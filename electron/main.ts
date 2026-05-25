@@ -63,55 +63,81 @@ function startBackend(logPath: string) {
       )
     : path.join(__dirname, "../backend/dist/server.js");
 
-  console.log(`Iniciando o backend: ${backendPath}`);
+  const instantClientPath = app.isPackaged
+    ? path.join(process.resourcesPath, "instantclient_19_30")
+    : path.join(__dirname, "../resources/instantclient_19_30");
+
+  const oracledbPath = app.isPackaged
+    ? path.join(process.resourcesPath, "oracledb")
+    : "";
+
+  fs.writeFileSync(
+    logPath,
+    `=== Iniciando ${new Date().toISOString()} ===\n` +
+      `app.isPackaged: ${app.isPackaged}\n` +
+      `process.resourcesPath: ${process.resourcesPath}\n` +
+      `backendPath: ${backendPath} (exists=${fs.existsSync(backendPath)})\n` +
+      `instantClientPath: ${instantClientPath} (exists=${fs.existsSync(instantClientPath)})\n` +
+      `oracledbPath: ${oracledbPath} (exists=${oracledbPath ? fs.existsSync(oracledbPath) : "n/a"})\n` +
+      `--- output do backend abaixo ---\n`,
+  );
+
   if (!fs.existsSync(backendPath)) {
-    console.error(
-      `Erro: Ficheiro do backend não encontrado em ${backendPath}. Certifique-se de que 'bun run build:backend' foi executado.`,
-    );
+    const msg = `Backend não encontrado em ${backendPath}`;
+    fs.appendFileSync(logPath, msg + "\n");
+    dialog.showErrorBox("Erro", msg);
     app.quit();
     return;
   }
 
-  let instantClientPath: string;
-  if (app.isPackaged) {
-    instantClientPath = path.join(process.resourcesPath, "instantclient_19_30");
-  } else {
-    instantClientPath = path.join(
-      __dirname,
-      "../resources/instantclient_19_30",
-    );
-  }
-
   if (!fs.existsSync(instantClientPath)) {
-    console.error(
-      `Erro: Instant Client não encontrado em ${instantClientPath}.`,
-    );
+    const msg = `Instant Client não encontrado em ${instantClientPath}`;
+    fs.appendFileSync(logPath, msg + "\n");
+    dialog.showErrorBox("Erro", msg);
     app.quit();
     return;
   }
 
   backendProcess = utilityProcess.fork(backendPath, [], {
+    stdio: "pipe",
     env: {
       ...process.env,
       PORT: backendPort.toString(),
       ORACLE_CLIENT_LIB_DIR: instantClientPath,
-      NODE_PATH: app.isPackaged ? process.resourcesPath : undefined,
+      ORACLEDB_PATH: oracledbPath,
       LOG_FILE: logPath,
     },
   });
 
+  let outputBuffer = "";
+
+  const capture = (chunk: Buffer) => {
+    const text = chunk.toString();
+    outputBuffer += text;
+    try {
+      fs.appendFileSync(logPath, text);
+    } catch {
+      // ignora erro de escrita no log
+    }
+  };
+
+  backendProcess.stdout?.on("data", capture);
+  backendProcess.stderr?.on("data", capture);
+
   backendProcess.on("spawn", () => {
-    console.log("Backend iniciado com sucesso.");
+    fs.appendFileSync(logPath, "[main] backend spawn event\n");
   });
 
   backendProcess.on("exit", (code) => {
-    console.log(`Backend encerrado com código: ${code}`);
+    fs.appendFileSync(logPath, `[main] backend exit code=${code}\n`);
     if (code !== 0) {
-      let msg = `Código de saída: ${code}\nLog: ${logPath}`;
-      try {
-        msg = fs.readFileSync(logPath, "utf-8");
-      } catch {
-        // log ainda não existe ou não pôde ser lido
+      let msg = outputBuffer;
+      if (!msg) {
+        try {
+          msg = fs.readFileSync(logPath, "utf-8");
+        } catch {
+          msg = `Código de saída: ${code}\nLog: ${logPath}`;
+        }
       }
       dialog.showErrorBox("Erro ao iniciar o backend", msg);
     }
@@ -138,7 +164,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  const logPath = path.join(app.getPath("userData"), "backend.log");
+  const logDir = app.getPath("userData");
+  fs.mkdirSync(logDir, { recursive: true });
+  const logPath = path.join(logDir, "backend.log");
   startBackend(logPath);
   const win = createWindow();
   if (app.isPackaged) {
