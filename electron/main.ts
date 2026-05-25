@@ -56,7 +56,9 @@ function setupAutoUpdater(win: BrowserWindow) {
 }
 
 function startBackend() {
-  const backendPath = path.join(__dirname, "../backend/dist/server.js");
+  const backendPath = app.isPackaged
+    ? path.join(process.resourcesPath, "app.asar.unpacked", "backend", "dist", "server.js")
+    : path.join(__dirname, "../backend/dist/server.js");
 
   console.log(`Iniciando o backend: ${backendPath}`);
   if (!fs.existsSync(backendPath)) {

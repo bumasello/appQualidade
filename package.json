@@ -46,6 +46,9 @@
       "resources/**/*",
       "package.json"
     ],
+    "asarUnpack": [
+      "backend/dist/**/*"
+    ],
     "win": {
       "target": [
         {
