@@ -1,6 +1,6 @@
 {
   "name": "app-qualidade-dados",
-  "version": "1.2.1-beta.2",
+  "version": "1.3.0",
   "description": "Aplicativo desktop para qualidade e curadoria de dados com Electron, React e Express.",
   "author": "Bruno Masello <bruno.masello@rededor.com.br>",
   "main": "dist-electron/main.cjs",
