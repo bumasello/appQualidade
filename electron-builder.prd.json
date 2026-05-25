@@ -13,13 +13,11 @@
     "dist-electron/**/*",
     "frontend/dist/**/*",
     "backend/dist/**/*",
-    "backend/node_modules/oracledb/**/*",
     "resources/**/*",
     "package.json"
   ],
   "asarUnpack": [
-    "backend/dist/**/*",
-    "backend/node_modules/oracledb/**/*"
+    "backend/dist/**/*"
   ],
   "extraResources": [
     {
@@ -30,6 +28,11 @@
     {
       "from": ".env.prd",
       "to": ".env.app"
+    },
+    {
+      "from": "backend/node_modules/oracledb",
+      "to": "oracledb",
+      "filter": ["**/*"]
     }
   ],
   "win": {

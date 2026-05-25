@@ -92,6 +92,7 @@ function startBackend() {
       ...process.env,
       PORT: backendPort.toString(),
       ORACLE_CLIENT_LIB_DIR: instantClientPath,
+      NODE_PATH: app.isPackaged ? process.resourcesPath : undefined,
     },
     stdio: "inherit",
   });
