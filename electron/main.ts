@@ -4,9 +4,7 @@ import * as path from "path";
 
 import { autoUpdater } from "electron-updater";
 
-import { app, BrowserWindow, dialog } from "electron";
-
-import { spawn, ChildProcess } from "child_process";
+import { app, BrowserWindow, dialog, utilityProcess } from "electron";
 
 const envFile = app.isPackaged
   ? path.join(process.resourcesPath, ".env.app")
@@ -14,7 +12,7 @@ const envFile = app.isPackaged
 
 dotenv.config({ path: envFile });
 
-let backendProcess: ChildProcess | null = null;
+let backendProcess: Electron.UtilityProcess | null = null;
 
 const backendPort: number = 8080;
 
@@ -92,23 +90,21 @@ function startBackend() {
     return;
   }
 
-  backendProcess = spawn("node", [backendPath], {
+  backendProcess = utilityProcess.fork(backendPath, [], {
     env: {
       ...process.env,
       PORT: backendPort.toString(),
       ORACLE_CLIENT_LIB_DIR: instantClientPath,
       NODE_PATH: app.isPackaged ? process.resourcesPath : undefined,
     },
-    stdio: "inherit",
-    windowsHide: true,
   });
 
-  backendProcess.on("error", (err) => {
-    console.log(`Erro ao iniciar o backend: ${err}`);
+  backendProcess.on("spawn", () => {
+    console.log("Backend iniciado com sucesso.");
   });
 
-  backendProcess.on("exit", (code, signal) => {
-    console.log(`Backend encerrado com código: ${code} e sinal: ${signal}`);
+  backendProcess.on("exit", (code) => {
+    console.log(`Backend encerrado com código: ${code}`);
   });
 }
 
