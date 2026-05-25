@@ -39,7 +39,7 @@ bun run dev:electron
 
 Confirma que o app abre, o login funciona e a funcionalidade alterada se comporta como esperado. **Só avança para o HML depois de validar aqui.**
 
-### 5. Mandar para HML (equipe testar)
+### 4. Mandar para HML (equipe testar)
 
 ```sh
 git checkout hml
@@ -50,7 +50,7 @@ git push --tags
 bun run dist:hml
 ```
 
-### 6. Aprovado → publicar PRD
+### 5. Aprovado → publicar PRD
 
 ```sh
 git checkout master
@@ -62,6 +62,19 @@ git push
 git push --tags
 bun run dist:prd
 ```
+
+### Sync master → hml (sem feature nova)
+
+Quando há apenas correções de infra/build no master que precisam ir para o HML, **sem** work nova a ser testada — não faz bump de versão:
+
+```sh
+git checkout hml
+git merge master
+git push
+bun run dist:hml
+```
+
+O bump (`npm version prerelease`) só acontece quando há feature nova entrando no HML para ser testada antes do PRD.
 
 ## Convenção de versão
 
