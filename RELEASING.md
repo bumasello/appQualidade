@@ -10,7 +10,7 @@
 ## Estratégia de branches
 
 | Branch   | Propósito                           |
-|----------|-------------------------------------|
+| -------- | ----------------------------------- |
 | `master` | Código estável, fonte do PRD        |
 | `hml`    | Staging — equipe testa aqui         |
 | `dev-*`  | Desenvolvimento de features e fixes |
@@ -31,7 +31,15 @@ git add <arquivos>
 git commit -m "feat: descrição"
 ```
 
-### 3. Mandar para HML (equipe testar)
+### 3. Testar local antes de subir
+
+```sh
+bun run dev:electron
+```
+
+Confirma que o app abre, o login funciona e a funcionalidade alterada se comporta como esperado. **Só avança para o HML depois de validar aqui.**
+
+### 5. Mandar para HML (equipe testar)
 
 ```sh
 git checkout hml
@@ -42,7 +50,7 @@ git push --tags
 bun run dist:hml
 ```
 
-### 4. Aprovado → publicar PRD
+### 6. Aprovado → publicar PRD
 
 ```sh
 git checkout master
@@ -57,12 +65,12 @@ bun run dist:prd
 
 ## Convenção de versão
 
-| Mudança              | Comando                                | Resultado             |
-|----------------------|----------------------------------------|-----------------------|
-| Correção de bug      | `npm version patch`                    | 1.1.0 → 1.1.1         |
-| Nova funcionalidade  | `npm version minor`                    | 1.1.0 → 1.2.0         |
-| Mudança estrutural   | `npm version major`                    | 1.1.0 → 2.0.0         |
-| Build de teste (HML) | `npm version prerelease --preid=beta`  | 1.1.0 → 1.1.1-beta.0  |
+| Mudança              | Comando                               | Resultado            |
+| -------------------- | ------------------------------------- | -------------------- |
+| Correção de bug      | `npm version patch`                   | 1.1.0 → 1.1.1        |
+| Nova funcionalidade  | `npm version minor`                   | 1.1.0 → 1.2.0        |
+| Mudança estrutural   | `npm version major`                   | 1.1.0 → 2.0.0        |
+| Build de teste (HML) | `npm version prerelease --preid=beta` | 1.1.0 → 1.1.1-beta.0 |
 
 ## Convenção de mensagens de commit
 
@@ -78,16 +86,16 @@ O `(<escopo>)` é opcional — indica a área afetada (ex: `backend`, `frontend`
 
 ### Tipos
 
-| Tipo       | Quando usar                                              | Impacto na versão |
-|------------|----------------------------------------------------------|-------------------|
-| `feat`     | Nova funcionalidade para o usuário                       | `minor` (1.1.0)   |
-| `fix`      | Correção de bug                                          | `patch` (1.0.1)   |
-| `docs`     | Apenas documentação (README, RELEASING, comentários)     | nenhum            |
-| `refactor` | Refatoração sem mudar comportamento externo              | nenhum            |
-| `chore`    | Manutenção: deps, configs, scripts de build              | nenhum            |
-| `style`    | Formatação, espaços, ponto e vírgula — sem lógica        | nenhum            |
-| `perf`     | Melhoria de performance                                  | `patch`           |
-| `ci`       | Mudanças em CI/CD                                        | nenhum            |
+| Tipo       | Quando usar                                          | Impacto na versão |
+| ---------- | ---------------------------------------------------- | ----------------- |
+| `feat`     | Nova funcionalidade para o usuário                   | `minor` (1.1.0)   |
+| `fix`      | Correção de bug                                      | `patch` (1.0.1)   |
+| `docs`     | Apenas documentação (README, RELEASING, comentários) | nenhum            |
+| `refactor` | Refatoração sem mudar comportamento externo          | nenhum            |
+| `chore`    | Manutenção: deps, configs, scripts de build          | nenhum            |
+| `style`    | Formatação, espaços, ponto e vírgula — sem lógica    | nenhum            |
+| `perf`     | Melhoria de performance                              | `patch`           |
+| `ci`       | Mudanças em CI/CD                                    | nenhum            |
 
 ### Breaking change → major
 
