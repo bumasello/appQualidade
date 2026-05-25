@@ -95,6 +95,7 @@ function startBackend() {
       NODE_PATH: app.isPackaged ? process.resourcesPath : undefined,
     },
     stdio: "inherit",
+    windowsHide: true,
   });
 
   backendProcess.on("error", (err) => {
