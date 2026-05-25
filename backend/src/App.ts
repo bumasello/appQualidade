@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import errorHandler from "./middleware/errorHandler";
 
-import VinculoMedicoRouter from "./router/prf_saude.router";
+import PrfSaudeRouter from "./router/prf_saude.router";
 import UserRouter from "./router/user.router";
 import UtilitariosRouter from "./router/utilitários.router";
 
@@ -29,7 +29,7 @@ class App {
   }
 
   private initRoute(): void {
-    this.app.use("/vinculomedico", VinculoMedicoRouter);
+    this.app.use("/prf_saude", PrfSaudeRouter);
     this.app.use("/user", UserRouter);
     this.app.use("/utilitarios", UtilitariosRouter);
   }

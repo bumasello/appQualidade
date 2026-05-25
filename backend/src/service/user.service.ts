@@ -1,5 +1,5 @@
 import oracledb from "oracledb";
-import OracleDatabase from "../database/oracleDatabase";
+import mdm_database from "../database/mdm_database";
 import { User } from "../model/user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -15,7 +15,7 @@ class UserService {
   public async loginUser(data: Pick<UserCredentials, "username" | "pass">) {
     const user = new User(data.username, data.pass);
 
-    const conn = await OracleDatabase.getConnection();
+    const conn = await mdm_database.getConnection();
 
     try {
       const consulta_user = await conn.execute(
@@ -63,7 +63,7 @@ class UserService {
 
   public async createUser(data: UserCredentials) {
     const { nome_completo, username, pass, email } = data;
-    const conn = await OracleDatabase.getConnection();
+    const conn = await mdm_database.getConnection();
 
     try {
       const consulta_user = await conn.execute(

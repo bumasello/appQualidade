@@ -2,7 +2,7 @@ import type { SubItem } from "@/types/navigation";
 
 export const prfSaudeSubItems: SubItem[] = [
   { label: "Vínculo Médico", automationKey: "vinculo-medico" },
-  { label: "Curadoria", automationKey: "curadoria-prf-saude" },
+  { label: "Repl. Curriculo", automationKey: "repl-curriculo-prf" },
 ];
 
 export const pacienteSubItems: SubItem[] = [

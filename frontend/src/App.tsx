@@ -9,6 +9,7 @@ import LoginPage from "./pages/Login";
 import { AuthProvider } from "./contexts/AuthContext";
 import Home from "./pages/Home";
 import ComparadorPlanilhas from "./pages/utilitarios/ComparadorPlanilhas";
+import ReplCurriculoPrf from "./pages/prf_saude/ReplCurriculoPrf";
 
 export type AutomationKey =
   | "home"
@@ -16,7 +17,7 @@ export type AutomationKey =
   | "vinculo-medico"
   | "curadoria-prf-saude"
   | "curadoria-pacientes"
-  | "dashboard"
+  | "repl-curriculo-prf"
   | "configuracoes"
   | "relatorios"
   | "pacientes"
@@ -37,16 +38,12 @@ function App() {
         return <Home />;
       case "vinculo-medico":
         return <VinculoMedicoPage />;
+      case "repl-curriculo-prf":
+        return <ReplCurriculoPrf />;
       case "curadoria-pacientes":
         return <CuradoriaPacientes />;
       case "comparador-planilhas":
         return <ComparadorPlanilhas />;
-      case "dashboard":
-        return (
-          <div className="flex flex-col items-center justify-center h-full">
-            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          </div>
-        );
       case "configuracoes":
         return (
           <div className="flex flex-col items-center justify-center h-full">

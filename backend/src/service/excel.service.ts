@@ -177,9 +177,13 @@ class ExcelService {
     }
   }
 
-  public readSheetAsMap(buffer: Buffer): {
+  public readSheetAsMap<
+    T extends Record<string, string | null> = Record<string, string | null>,
+  >(
+    buffer: Buffer,
+  ): {
     headers: string[];
-    rows: Record<string, string | null>[];
+    rows: T[];
   } {
     const workbook = xlsx.read(buffer, { type: "buffer" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -204,7 +208,7 @@ class ExcelService {
       return record;
     });
 
-    return { headers, rows };
+    return { headers, rows: rows as T[] };
   }
 }
 

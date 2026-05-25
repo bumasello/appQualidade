@@ -61,11 +61,11 @@ const VinculoMedicoPage: React.FC = () => {
     }
 
     setIsLoading(true);
-    console.log(`Buscando médico com CRM: ${crm} e UF: ${uf}`);
+    // console.log(`Buscando médico com CRM: ${crm} e UF: ${uf}`);
 
     try {
       const response = await fetch(
-        `http://localhost:8080/vinculomedico/buscar?crm=${crm}&uf=${uf}`,
+        `http://localhost:8080/prf_saude/buscar?crm=${crm}&uf=${uf}`,
         {
           method: "GET",
         },
@@ -110,28 +110,25 @@ const VinculoMedicoPage: React.FC = () => {
       return;
     }
 
-    console.log(
-      `Realizando vínculo para CRM: ${crm}, UF: ${uf}, CPF: ${
-        cpfVinculado || cpf
-      }`,
-    );
+    // console.log(
+    //   `Realizando vínculo para CRM: ${crm}, UF: ${uf}, CPF: ${
+    //     cpfVinculado || cpf
+    //   }`,
+    // );
 
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `http://localhost:8080/vinculomedico/vincular`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            crm,
-            uf,
-            cpf,
-          }),
+      const response = await fetch(`http://localhost:8080/prf_saude/vincular`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          crm,
+          uf,
+          cpf,
+        }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -171,7 +168,7 @@ const VinculoMedicoPage: React.FC = () => {
     if (file) {
       // setSelectedFile(file);
       // Aqui você pode adicionar uma validação inicial do arquivo (tamanho, tipo)
-      console.log("Arquivo selecionado:", file.name);
+      // console.log("Arquivo selecionado:", file.name);
       // Opcional: Chamar a função de upload imediatamente após a seleção
       handleUploadBatchFile(file);
     }
@@ -180,7 +177,7 @@ const VinculoMedicoPage: React.FC = () => {
   // NOVO: Função para simular o upload do arquivo em lote para o backend
   const handleUploadBatchFile = async (file: File) => {
     setIsBatchUploading(true);
-    console.log(`Enviando arquivo ${file.name} para processamento em lote...`);
+    // console.log(`Enviando arquivo ${file.name} para processamento em lote...`);
 
     // Simulação de upload para o backend
     // Você usaria FormData para enviar o arquivo:
@@ -188,7 +185,7 @@ const VinculoMedicoPage: React.FC = () => {
     formData.append("excelFile", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/vinculomedico/vincularbatch",
+        "http://localhost:8080/prf_saude/vincularbatch",
         {
           method: "POST",
           body: formData,

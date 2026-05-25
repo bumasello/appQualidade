@@ -1,15 +1,16 @@
 import { AppError } from "../error/appError";
-import VinculoMedicoService from "../service/prf_saude.service"; // Importa a instância
+import PrfSaudeService from "../service/prf_saude.service"; // Importa a instância
 import ExcelService from "../service/excel.service"; // Importa a instância
 
 import type { Request, Response, NextFunction } from "express";
+import { Handler } from "../type/handler";
 
-export class VinculoMedicoController {
-  private vinculoMedicoService: VinculoMedicoService;
+export class PrfSaudeController {
+  private prf_saude_service: PrfSaudeService;
   private excelService: ExcelService;
 
   constructor() {
-    this.vinculoMedicoService = new VinculoMedicoService();
+    this.prf_saude_service = new PrfSaudeService();
     this.excelService = new ExcelService();
   }
 
@@ -28,7 +29,7 @@ export class VinculoMedicoController {
         );
       }
 
-      const result = await this.vinculoMedicoService.realizaVinculoMedico(
+      const result = await this.prf_saude_service.realizaVinculoMedico(
         crm,
         uf,
         cpf,
@@ -54,8 +55,6 @@ export class VinculoMedicoController {
     try {
       const { crm, uf } = req.query;
 
-      // A validação de presença já está aqui, então o if (!crm || !uf) inicial é redundante
-      // e pode ser removido se preferir. Mantive para não alterar muito a estrutura original.
       if (!crm || !uf) {
         throw new AppError(
           "[buscaMedico] Todos os campos são obrigatórios!",
@@ -66,27 +65,23 @@ export class VinculoMedicoController {
       let crmValue: string;
       let ufValue: string;
 
-      // Validação para crm
       if (typeof crm === "string") {
         crmValue = crm;
       } else if (Array.isArray(crm) && typeof crm[0] === "string") {
-        crmValue = crm[0]; // Pega o primeiro valor se for um array de strings
+        crmValue = crm[0];
       } else {
-        // Se crm for undefined, ParsedQs, ou um array de algo que não é string
         throw new AppError("[buscaMedico] CRM inválido ou ausente!", 422);
       }
 
-      // Validação para uf
       if (typeof uf === "string") {
         ufValue = uf;
       } else if (Array.isArray(uf) && typeof uf[0] === "string") {
-        ufValue = uf[0]; // Pega o primeiro valor se for um array de strings
+        ufValue = uf[0];
       } else {
-        // Se uf for undefined, ParsedQs, ou um array de algo que não é string
         throw new AppError("[buscaMedico] UF inválido ou ausente!", 422);
       }
 
-      const result = await this.vinculoMedicoService.buscaMedico(
+      const result = await this.prf_saude_service.buscaMedico(
         crmValue,
         ufValue,
       );
@@ -114,41 +109,28 @@ export class VinculoMedicoController {
         );
       }
 
-      // Defina os cabeçalhos OBRIGATÓRIOS que espera na planilha para esta operação
-      // Estes devem corresponder EXATAMENTE aos nomes das colunas na planilha Excel
       const requiredHeaders = ["Nº conselho", "UF conselho", "CPF rec Federal"];
 
-      // 1. Processamento estrutural do Excel pelo ExcelService
       const excelProcessResult = await this.excelService.processVinculoExcel(
         req.file.buffer,
         requiredHeaders,
       );
 
-      // Se NENHUMA linha válida foi extraída do Excel, então é um erro que impede o processamento.
-      // excelProcessResult.success pode ser false se houve erros em algumas linhas, mas data.length > 0
       if (excelProcessResult.data.length === 0) {
         throw new AppError(
           excelProcessResult.message ||
             "Nenhuma linha válida encontrada na planilha para processamento.",
-          400, // Bad Request, pois o ficheiro não continha dados processáveis
+          400,
         );
       }
-      // console.log(excelProcessResult.data);
 
-      // res.status(200).json({ success: true });
-      // console.log(excelProcessResult); // Manter para depuração se necessário
-      // console.log(excelProcessResult.data);
-
-      // 2. Processamento de negócio e atualização no banco pelo VinculoMedicoService
-      // Corrigido o typo 'processaVinculoMedicoBatch' para 'processVinculoMedicoBatch'
       const batchProcessResult =
-        await this.vinculoMedicoService.processaVinculoMedicoBatch(
+        await this.prf_saude_service.processaVinculoMedicoBatch(
           excelProcessResult.data,
         );
 
-      // Agora, construímos uma mensagem de resposta abrangente que inclui todos os resultados.
       const finalMessageParts: string[] = [];
-      let overallSuccess = true; // Assume sucesso geral, a menos que haja falhas críticas
+      let overallSuccess = true;
 
       if (batchProcessResult.successfulUpdates > 0) {
         finalMessageParts.push(
@@ -159,16 +141,15 @@ export class VinculoMedicoController {
         finalMessageParts.push(
           `${batchProcessResult.failedUpdates} vínculos falharam na atualização.`,
         );
-        overallSuccess = false; // Se houve falhas no DB/negócio, o sucesso geral é parcial ou falho
+        overallSuccess = false;
       }
       if (excelProcessResult.failedCount > 0) {
         finalMessageParts.push(
           `${excelProcessResult.failedCount} linhas foram ignoradas devido a erros estruturais.`,
         );
-        overallSuccess = false; // Se houve falhas estruturais, o sucesso geral é parcial ou falho
+        overallSuccess = false;
       }
 
-      // Se não houve nenhuma operação bem-sucedida (nem estrutural, nem no DB)
       if (
         batchProcessResult.successfulUpdates === 0 &&
         excelProcessResult.processedCount === 0
@@ -182,22 +163,38 @@ export class VinculoMedicoController {
           ? finalMessageParts.join(" ")
           : "Processamento concluído sem resultados específicos.";
 
-      // Determina o status HTTP com base no resultado
-      let statusCode = 200; // OK para sucesso total ou parcial
+      let statusCode = 200;
       if (!overallSuccess && batchProcessResult.successfulUpdates === 0) {
-        statusCode = 400; // Bad Request se nada foi processado com sucesso
+        statusCode = 400;
       }
 
       res.status(statusCode).json({
-        success: overallSuccess, // Indica se o processo foi totalmente bem-sucedido ou teve falhas
+        success: overallSuccess,
         message: finalMessage,
         details: {
-          excelProcessing: excelProcessResult, // Detalhes do processamento estrutural
-          batchProcessing: batchProcessResult, // Detalhes do processamento em lote (DB/negócio)
+          excelProcessing: excelProcessResult,
+          batchProcessing: batchProcessResult,
         },
       });
     } catch (error) {
-      // O errorHandler global irá capturar os AppErrors lançados
+      next(error);
+    }
+  };
+
+  public replicaCurriculoPrf: Handler = async (req, res, next) => {
+    try {
+      const file = req.file as Express.Multer.File;
+
+      if (!file) {
+        throw new AppError("Arquivo para replica é obrigatório!", 400);
+      }
+
+      const result = await this.prf_saude_service.replicaCurriculoPrf(
+        file.buffer,
+      );
+      console.log(result);
+      res.status(201).json({ ...result });
+    } catch (error) {
       next(error);
     }
   };
