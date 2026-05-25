@@ -3,20 +3,11 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 
-import {
-  ChevronLeft,
-  ChevronRight,
-  Stethoscope,
-  FileUser,
-  TestTube,
-  Hammer,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Stethoscope, Hammer } from "lucide-react";
 
 import { AsideListItem } from "./AsideListItem";
 import {
-  pacienteSubItems,
   prfSaudeSubItems,
-  testSubItems,
   utilitariosSubItems,
 } from "@/config/asideNavigation";
 
