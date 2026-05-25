@@ -1,12 +1,25 @@
 {
   "appId": "com.rededor.appqualidade.hml",
   "productName": "App Qualidade HML",
+  "directories": {
+    "output": "release"
+  },
   "publish": {
     "provider": "github",
     "owner": "bumasello",
     "repo": "appQualidade",
     "channel": "beta"
   },
+  "files": [
+    "dist-electron/**/*",
+    "frontend/dist/**/*",
+    "backend/dist/**/*",
+    "resources/**/*",
+    "package.json"
+  ],
+  "asarUnpack": [
+    "backend/dist/**/*"
+  ],
   "extraResources": [
     {
       "from": "resources/instantclient_19_30",
@@ -18,6 +31,15 @@
       "to": ".env.app"
     }
   ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build/favicon.png"
+  },
   "nsis": {
     "oneClick": false,
     "perMachine": false,
