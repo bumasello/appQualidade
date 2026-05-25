@@ -8,7 +8,7 @@
   "scripts": {
     "build:electron": "esbuild electron/main.ts --bundle --platform=node --external:electron --external:electron-updater --outfile=dist-electron/main.cjs --format=cjs",
     "build:react": "cd frontend && bun run build",
-    "build:backend": "cd backend && bunx tsc",
+    "build:backend": "esbuild backend/src/server.ts --bundle --platform=node --external:oracledb --outfile=backend/dist/server.js",
     "dev:electron": "bun run build:electron && bun run build:react && bun run build:backend && electron dist-electron/main.cjs",
     "dev:react": "cd frontend && bun run dev",
     "dev:backend": "cd backend && bun run dev",

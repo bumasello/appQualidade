@@ -14,11 +14,13 @@
     "dist-electron/**/*",
     "frontend/dist/**/*",
     "backend/dist/**/*",
+    "backend/node_modules/oracledb/**/*",
     "resources/**/*",
     "package.json"
   ],
   "asarUnpack": [
-    "backend/dist/**/*"
+    "backend/dist/**/*",
+    "backend/node_modules/oracledb/**/*"
   ],
   "extraResources": [
     {
