@@ -5,12 +5,9 @@ import * as path from "path";
 import { autoUpdater } from "electron-updater";
 
 import { app, BrowserWindow, dialog } from "electron";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+
 import { spawn, ChildProcess } from "child_process";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 const APP_ENV = process.env.APP_ENV ?? "prd";
 const envFile = app.isPackaged
   ? path.join(process.resourcesPath, ".env.app")
