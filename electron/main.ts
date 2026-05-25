@@ -8,7 +8,6 @@ import { app, BrowserWindow, dialog } from "electron";
 
 import { spawn, ChildProcess } from "child_process";
 
-const APP_ENV = process.env.APP_ENV ?? "prd";
 const envFile = app.isPackaged
   ? path.join(process.resourcesPath, ".env.app")
   : path.join(__dirname, `../.env.${process.env.APP_ENV ?? "prd"}`);
@@ -57,7 +56,13 @@ function setupAutoUpdater(win: BrowserWindow) {
 
 function startBackend() {
   const backendPath = app.isPackaged
-    ? path.join(process.resourcesPath, "app.asar.unpacked", "backend", "dist", "server.js")
+    ? path.join(
+        process.resourcesPath,
+        "app.asar.unpacked",
+        "backend",
+        "dist",
+        "server.js",
+      )
     : path.join(__dirname, "../backend/dist/server.js");
 
   console.log(`Iniciando o backend: ${backendPath}`);
