@@ -36,9 +36,6 @@ const Aside: React.FC<AsideProps> = ({
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
-    // if (!isCollapsed) {
-    //   setOpenAccordionItem(undefined);
-    // }
   };
 
   return (
@@ -90,7 +87,7 @@ const Aside: React.FC<AsideProps> = ({
             onAccordionValueChange={setOpenAccordionItem}
             subItems={prfSaudeSubItems}
           />
-          {/* Item Pacientes */}
+          {/* Item Pacientes 
           <AsideListItem
             icon={FileUser}
             label="Pacientes"
@@ -102,6 +99,7 @@ const Aside: React.FC<AsideProps> = ({
             onAccordionValueChange={setOpenAccordionItem}
             subItems={pacienteSubItems}
           />
+          */}
           <AsideListItem
             icon={Hammer}
             label="Utilitários"
@@ -112,18 +110,6 @@ const Aside: React.FC<AsideProps> = ({
             currentAccordionValue={openAccordionItem}
             onAccordionValueChange={setOpenAccordionItem}
             subItems={utilitariosSubItems}
-          ></AsideListItem>
-          {/* Item Teste */}
-          <AsideListItem
-            icon={TestTube}
-            label="Teste"
-            onSelectAutomation={onSelectAutomation}
-            selectedAutomation={selectedAutomation}
-            isCollapsed={isCollapsed}
-            accordionValue="item-teste"
-            currentAccordionValue={openAccordionItem}
-            onAccordionValueChange={setOpenAccordionItem}
-            subItems={testSubItems}
           ></AsideListItem>
         </nav>
       </div>

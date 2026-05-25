@@ -64,6 +64,52 @@ bun run dist:prd
 | Mudança estrutural   | `npm version major`                    | 1.1.0 → 2.0.0         |
 | Build de teste (HML) | `npm version prerelease --preid=beta`  | 1.1.0 → 1.1.1-beta.0  |
 
+## Convenção de mensagens de commit
+
+Usamos o padrão **Conventional Commits** — o mais adotado no mercado e compatível com ferramentas de changelog automático.
+
+### Formato
+
+```
+<tipo>(<escopo>): <descrição curta>
+```
+
+O `(<escopo>)` é opcional — indica a área afetada (ex: `backend`, `frontend`, `build`, `electron`).
+
+### Tipos
+
+| Tipo       | Quando usar                                              | Impacto na versão |
+|------------|----------------------------------------------------------|-------------------|
+| `feat`     | Nova funcionalidade para o usuário                       | `minor` (1.1.0)   |
+| `fix`      | Correção de bug                                          | `patch` (1.0.1)   |
+| `docs`     | Apenas documentação (README, RELEASING, comentários)     | nenhum            |
+| `refactor` | Refatoração sem mudar comportamento externo              | nenhum            |
+| `chore`    | Manutenção: deps, configs, scripts de build              | nenhum            |
+| `style`    | Formatação, espaços, ponto e vírgula — sem lógica        | nenhum            |
+| `perf`     | Melhoria de performance                                  | `patch`           |
+| `ci`       | Mudanças em CI/CD                                        | nenhum            |
+
+### Breaking change → major
+
+Para mudanças que quebram compatibilidade, adiciona `!` após o tipo:
+
+```
+feat!: remove endpoint /user/create_user
+```
+
+Isso sinaliza `major` (1.0.0 → 2.0.0).
+
+### Exemplos reais do projeto
+
+```
+feat(backend): adiciona serviço de replicação de currículo PRF
+fix(electron): oculta janela do node.exe no Windows
+fix(build): bundle backend com esbuild e inclui oracledb no pacote
+chore: corrige publish hml e adiciona guia de release
+docs: adiciona git push e push --tags no fluxo de release
+refactor(backend): extrai QLDService e QLDDatabase como módulos separados
+```
+
 ## Observações
 
 - O `npm version` exige working directory limpo. Commita tudo antes.
