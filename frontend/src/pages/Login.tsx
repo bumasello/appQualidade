@@ -68,7 +68,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSucess }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full p-8">
+    <div className="flex flex-col items-center justify-center h-full p-8 gap-2">
       <Card className="transition-all ease-in-out duration-300 w-full max-w-md p6 bg-gray-900 text-white rounded-xl shadow-2xl hover:shadow-none">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Login</CardTitle>
@@ -124,6 +124,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSucess }) => {
           </div>
         </CardFooter>
       </Card>
+      <span className="text-xs text-gray-500">v{__APP_VERSION__}</span>
     </div>
   );
 };
