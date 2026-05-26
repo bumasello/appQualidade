@@ -19,7 +19,7 @@ class UserService {
 
     try {
       const consulta_user = await conn.execute(
-        "select username, PASSWORD from mdm_usr.usuario_app_qualidade where username = :username",
+        `select username, PASSWORD from ${process.env.MDM_TBL_USUARIOS} where username = :username`,
         { username: user.username },
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
@@ -67,7 +67,7 @@ class UserService {
 
     try {
       const consulta_user = await conn.execute(
-        "select username from mdm_usr.usuario_app_qualidade where username = :username",
+        `select username from ${process.env.MDM_TBL_USUARIOS} where username = :username`,
         { username: username },
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
@@ -82,10 +82,10 @@ class UserService {
       const hashedPass = await bcrypt.hash(pass, 10);
 
       const result = await conn.execute(
-        `INSERT INTO mdm_usr.usuario_app_qualidade 
+        `INSERT INTO ${process.env.MDM_TBL_USUARIOS}
             (id, nome_completo, username, password, email, data_criacao, primeiro_acesso)
-          VALUES 
-            (mdm_usr.usuario_app_qualidade_seq.NEXTVAL, :nome_completo, :username, :pass, :email, SYSDATE, 0)`,
+          VALUES
+            (${process.env.MDM_SEQ_USUARIOS}.NEXTVAL, :nome_completo, :username, :pass, :email, SYSDATE, 0)`,
         {
           nome_completo: nome_completo,
           username: username,

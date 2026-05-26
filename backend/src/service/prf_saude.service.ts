@@ -73,8 +73,8 @@ class PrfSaudeService {
                     DMO.NOME_MEDICO as NOME_MEDICO_ONCO,
                     TO_CHAR(DMO.NUMERO_CONSELHO) as NUMERO_CONSELHO_ONCO
                 FROM
-                    QUALIDADEDADOS.DQ_MEDICOS_ONCO DMO
-                LEFT JOIN QUALIDADEDADOS.DQ_MEDICOS DM
+                    ${process.env.QLD_TBL_MEDICOS_ONCO} DMO
+                LEFT JOIN ${process.env.QLD_TBL_MEDICOS} DM
                 ON
                     (trim(DM.NOME_MEDICO) = trim(DMO.NOME_MEDICO))
                 WHERE
@@ -116,30 +116,30 @@ class PrfSaudeService {
 
         await this.qld_service.update(
           `
-       UPDATE QUALIDADEDADOS.DQ_MEDICOS DQ
-                SET 
+       UPDATE ${process.env.QLD_TBL_MEDICOS} DQ
+                SET
                     FILIACAO = (
                         SELECT ONCO.FILIACAO
-                        FROM QUALIDADEDADOS.DQ_MEDICOS_ONCO ONCO
+                        FROM ${process.env.QLD_TBL_MEDICOS_ONCO} ONCO
                         WHERE ONCO.NUMERO_CONSELHO = DQ.NUMERO_CONSELHO
                         AND trim(ONCO.NOME_MEDICO) = trim(DQ.NOME_MEDICO)
                         AND ONCO.FILIACAO IS NOT NULL
                     ),
                     FORMACAO_ACADEMICA = (
                         SELECT ONCO.FORMACAO_ACADEMICA
-                        FROM QUALIDADEDADOS.DQ_MEDICOS_ONCO ONCO
+                        FROM ${process.env.QLD_TBL_MEDICOS_ONCO} ONCO
                         WHERE ONCO.NUMERO_CONSELHO = DQ.NUMERO_CONSELHO
                         AND trim(ONCO.NOME_MEDICO) = trim(DQ.NOME_MEDICO)
                         AND ONCO.FORMACAO_ACADEMICA IS NOT NULL
                     ),
                     TITULOS = (
                         SELECT ONCO.TITULOS
-                        FROM QUALIDADEDADOS.DQ_MEDICOS_ONCO ONCO
+                        FROM ${process.env.QLD_TBL_MEDICOS_ONCO} ONCO
                         WHERE ONCO.NUMERO_CONSELHO = DQ.NUMERO_CONSELHO
                         AND trim(ONCO.NOME_MEDICO) = trim(DQ.NOME_MEDICO)
                         AND ONCO.TITULOS IS NOT NULL
                     )
-                WHERE DQ.ID_DQ_MEDICOS = :id 
+                WHERE DQ.ID_DQ_MEDICOS = :id
         `,
           { id: result.ID_DQ_MEDICOS },
           1,
@@ -168,7 +168,7 @@ class PrfSaudeService {
 
     try {
       const result = await conn.execute(
-        "update bcr.BCR_CTR_EXT_CNS_PRF set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf",
+        `update ${process.env.MDM_TBL_PRF_CADASTRO} set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf`,
         { cpf: vinculo.cpf, crm: vinculo.crm, uf: vinculo.uf },
         { autoCommit: true },
       );
@@ -207,7 +207,7 @@ class PrfSaudeService {
 
     try {
       const result = await conn.execute(
-        "SELECT nome, NR_DOC_PRF AS crm, SG_UF AS uf, NR_CPF AS cpf FROM bcr.BCR_CTR_EXT_CNS_PRF WHERE NR_DOC_PRF = :crm AND SG_UF = :uf",
+        `SELECT nome, NR_DOC_PRF AS crm, SG_UF AS uf, NR_CPF AS cpf FROM ${process.env.MDM_TBL_PRF_CADASTRO} WHERE NR_DOC_PRF = :crm AND SG_UF = :uf`,
         { crm: medico.crm, uf: medico.uf },
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
@@ -296,7 +296,7 @@ class PrfSaudeService {
           }
 
           const updateResult = await conn.execute(
-            "update bcr.BCR_CTR_EXT_CNS_PRF set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf",
+            `update ${process.env.MDM_TBL_PRF_CADASTRO} set nr_cpf = :cpf where nr_doc_prf = :crm and sg_uf = :uf`,
             {
               cpf: rowData["CPF rec Federal"],
               crm: rowData["Nº conselho"],
