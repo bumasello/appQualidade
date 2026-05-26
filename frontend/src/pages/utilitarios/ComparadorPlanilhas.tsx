@@ -46,13 +46,26 @@ const ComparadorPlanilhas: React.FC = () => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const workbook = XLSX.read(e.target?.result, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1 });
-        const headers = (rows[0] ?? []) as string[];
-        resolve(headers.filter((h) => h && h.trim().toUpperCase() !== "CHAVE"));
+        try {
+          const workbook = XLSX.read(e.target?.result, { type: "array" });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          if (!sheet) {
+            resolve([]);
+            return;
+          }
+          const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
+            header: 1,
+          });
+          const rawHeaders = (rows[0] ?? []) as unknown[];
+          const cols = rawHeaders
+            .map((h) => (h == null ? "" : String(h).trim()))
+            .filter((h) => h && h.toUpperCase() !== "CHAVE");
+          resolve(cols);
+        } catch (err) {
+          reject(err);
+        }
       };
-      reader.onerror = reject;
+      reader.onerror = () => reject(reader.error);
       reader.readAsArrayBuffer(file);
     });
   };
@@ -64,8 +77,19 @@ const ComparadorPlanilhas: React.FC = () => {
     setColumns([]);
     setSelectedColumns([]);
     if (file) {
-      const cols = await readColumns(file);
-      setColumns(cols);
+      try {
+        const cols = await readColumns(file);
+        if (cols.length === 0) {
+          toast.warning(
+            "Nenhuma coluna encontrada na primeira linha do arquivo.",
+          );
+        }
+        setColumns(cols);
+      } catch (err) {
+        toast.error(
+          `Erro ao ler arquivo: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
     }
     setIsLoadingFileOld(false);
   };
