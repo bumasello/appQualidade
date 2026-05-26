@@ -16,10 +16,31 @@ let backendProcess: Electron.UtilityProcess | null = null;
 
 const backendPort: number = 8080;
 
-function setupAutoUpdater(win: BrowserWindow) {
+function setupAutoUpdater(win: BrowserWindow, logPath: string) {
+  const updLog = (msg: string) => {
+    try {
+      fs.appendFileSync(
+        logPath,
+        `[updater ${new Date().toISOString()}] ${msg}\n`,
+      );
+    } catch {
+      // ignora
+    }
+  };
+
   autoUpdater.autoDownload = false;
+  updLog(`versao atual: ${app.getVersion()}`);
+
+  autoUpdater.on("checking-for-update", () => updLog("checando..."));
+  autoUpdater.on("update-not-available", (info) =>
+    updLog(`nenhuma atualizacao (remota=${info.version})`),
+  );
+  autoUpdater.on("download-progress", (p) =>
+    updLog(`download: ${p.percent.toFixed(1)}%`),
+  );
 
   autoUpdater.on("update-available", (info) => {
+    updLog(`update disponivel: ${info.version}`);
     dialog
       .showMessageBox(win, {
         type: "info",
@@ -33,6 +54,7 @@ function setupAutoUpdater(win: BrowserWindow) {
   });
 
   autoUpdater.on("update-downloaded", () => {
+    updLog("download concluido");
     dialog
       .showMessageBox(win, {
         type: "info",
@@ -46,10 +68,12 @@ function setupAutoUpdater(win: BrowserWindow) {
   });
 
   autoUpdater.on("error", (err) => {
-    console.error("Erro no auto-updater: ", err);
+    updLog(`ERRO: ${err.stack ?? err.message}`);
   });
 
-  autoUpdater.checkForUpdates().catch(console.error);
+  autoUpdater.checkForUpdates().catch((err) => {
+    updLog(`checkForUpdates rejected: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
+  });
 }
 
 function startBackend(logPath: string) {
@@ -170,7 +194,7 @@ app.whenReady().then(() => {
   startBackend(logPath);
   const win = createWindow();
   if (app.isPackaged) {
-    setupAutoUpdater(win);
+    setupAutoUpdater(win, logPath);
   }
 });
 

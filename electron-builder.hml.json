@@ -8,7 +8,8 @@
     "provider": "github",
     "owner": "bumasello",
     "repo": "appQualidade",
-    "channel": "beta"
+    "channel": "beta",
+    "releaseType": "prerelease"
   },
   "files": [
     "dist-electron/**/*",
