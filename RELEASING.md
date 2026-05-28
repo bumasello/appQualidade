@@ -63,6 +63,19 @@ git push --tags
 bun run dist:prd
 ```
 
+### 6. Sincronizar master → HML após o PRD
+
+Sempre que o master receber um bump de versão (passo 5), sincronize de volta no HML para manter a base de versão alinhada:
+
+```sh
+git checkout hml
+git merge master   # traz o bump de versão do PRD para o HML
+git push
+# não precisa de dist:hml — nenhuma feature nova, só alinhamento de versão
+```
+
+Sem esse passo, o próximo `npm version prerelease` no HML parte da versão antiga e gera um número errado (ex: `1.3.8-beta.2` em vez de `1.4.1-beta.0`).
+
 ### Sync master → hml (sem feature nova)
 
 Quando há apenas correções de infra/build no master que precisam ir para o HML, **sem** work nova a ser testada — não faz bump de versão:
