@@ -3,6 +3,8 @@ import mdm_database from "../database/mdm_database";
 import { User } from "../model/user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import MDMService from "./mdm.service";
+import { AppError } from "../error/appError";
 
 interface UserCredentials {
   username: string;
@@ -12,14 +14,20 @@ interface UserCredentials {
 }
 
 class UserService {
-  public async loginUser(data: Pick<UserCredentials, "username" | "pass">) {
+  private mdm_service: MDMService;
+
+  constructor() {
+    this.mdm_service = new MDMService();
+  }
+
+  public async login_user(data: Pick<UserCredentials, "username" | "pass">) {
     const user = new User(data.username, data.pass);
 
     const conn = await mdm_database.getConnection();
 
     try {
       const consulta_user = await conn.execute(
-        `select username, PASSWORD from ${process.env.MDM_TBL_USUARIOS} where username = :username`,
+        `select username, PASSWORD, PRIMEIRO_ACESSO from ${process.env.MDM_TBL_USUARIOS} where username = :username`,
         { username: user.username },
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
@@ -31,9 +39,10 @@ class UserService {
         };
       }
 
-      const { USERNAME, PASSWORD } = consulta_user.rows[0] as {
+      const { USERNAME, PASSWORD, PRIMEIRO_ACESSO } = consulta_user.rows[0] as {
         USERNAME: string;
         PASSWORD: string;
+        PRIMEIRO_ACESSO: string;
       };
 
       const ok = await bcrypt.compare(user.pass, PASSWORD);
@@ -53,6 +62,7 @@ class UserService {
         success: true,
         message: "Login bem sucedido!",
         token: token,
+        primeiro_acesso: PRIMEIRO_ACESSO,
       };
     } catch (error) {
       throw new Error(`[loginUser] Erro ao realizar login. ${error}`);
@@ -61,7 +71,7 @@ class UserService {
     }
   }
 
-  public async createUser(data: UserCredentials) {
+  public async create_user(data: UserCredentials) {
     const { nome_completo, username, pass, email } = data;
     const conn = await mdm_database.getConnection();
 
@@ -113,6 +123,93 @@ class UserService {
       throw new Error("Erro ao criar usuário!");
     } finally {
       await conn.close();
+    }
+  }
+
+  public async reset_password(
+    data: Pick<UserCredentials, "username" | "pass">,
+  ): Promise<{ success: true; EMAIL: string }> {
+    const { username, pass } = data;
+
+    try {
+      const user_found = await this.mdm_service.query(
+        `
+      SELECT
+        USERNAME, EMAIL FROM ${process.env.MDM_TBL_USUARIOS}
+      WHERE
+        USERNAME = :username
+      `,
+        { username: username },
+      );
+
+      if (user_found.length < 1)
+        throw new AppError("Usuário não encontrado", 404);
+
+      const { EMAIL } = user_found[0] as {
+        USERNAME: string;
+        EMAIL: string;
+      };
+      const hashedPass = await bcrypt.hash(pass, 10);
+
+      await this.mdm_service.update(
+        `
+     UPDATE
+      ${process.env.MDM_TBL_USUARIOS}
+     SET
+      PASSWORD = :hashpass,
+      PRIMEIRO_ACESSO = 1
+     WHERE
+      USERNAME = :username
+      `,
+        {
+          username: username,
+          hashpass: hashedPass,
+        },
+        1,
+      );
+
+      return {
+        success: true,
+        EMAIL: EMAIL,
+      };
+    } catch (error) {
+      console.error("[resetPassword] Erro ao resetar a senha do usuário!");
+      throw new Error("Erro ao resetar a senha do usuário!");
+    }
+  }
+  public async change_password(
+    data: Pick<UserCredentials, "username" | "pass">,
+  ): Promise<{ success: boolean; message: string }> {
+    const { username, pass } = data;
+
+    try {
+      const hashedPass = await bcrypt.hash(pass, 10);
+
+      await this.mdm_service.update(
+        `
+     UPDATE
+      ${process.env.MDM_TBL_USUARIOS}
+     SET
+      PASSWORD = :hashedPass,
+      PRIMEIRO_ACESSO = 0
+     WHERE
+      USERNAME = :username
+      `,
+        {
+          username: username,
+          hashedPass: hashedPass,
+        },
+        1,
+      );
+
+      return {
+        success: true,
+        message: "Senha alterada com sucesso",
+      };
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      console.error("[change_password] Erro ao mudar a senha do usuário!");
+      throw new Error("Erro ao mudar a senha do usuário!");
     }
   }
 }
