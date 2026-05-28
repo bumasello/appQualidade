@@ -88,7 +88,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSucess }) => {
   const handleResetPassword = async () => {
     if (!username) {
       toast.error("Preenchimento obrigatório", {
-        description: "Por favor, preencha os campo usuário.",
+        description: "Por favor, preencha o campo usuário.",
       });
       return;
     }
