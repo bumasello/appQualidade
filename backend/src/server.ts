@@ -21,6 +21,8 @@ const REQUIRED_ENV = [
   "MDM_TBL_PRF_CADASTRO",
   "QLD_TBL_MEDICOS",
   "QLD_TBL_MEDICOS_ONCO",
+  "SMTP_HOST",
+  "SMTP_PORT",
 ];
 
 const app = new App(8080);
@@ -52,7 +54,8 @@ const app = new App(8080);
     app.listen();
     console.log("Backend ouvindo na porta 8080.");
   } catch (error) {
-    const msg = error instanceof Error ? error.stack ?? error.message : String(error);
+    const msg =
+      error instanceof Error ? (error.stack ?? error.message) : String(error);
     console.error(`ERRO FATAL: ${msg}`);
     process.exit(1);
   }

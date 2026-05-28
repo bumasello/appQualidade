@@ -5,12 +5,11 @@ interface TestResult {
   SOMA: number;
 }
 
-class OracleDatabase {
+class MDMDatabase {
   static pool: Pool;
 
   static async initPool() {
     if (this.pool) return;
-
     this.pool = await oracledb.createPool({
       user: process.env.MDM_USER,
       password: process.env.MDM_PASSWORD,
@@ -46,4 +45,4 @@ class OracleDatabase {
   }
 }
 
-export default OracleDatabase;
+export default MDMDatabase;
