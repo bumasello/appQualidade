@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Aside from "./components/Aside";
 
-import VinculoMedicoPage from "./pages/prf_saude/VinculoMedico";
+import VinculoProfissional from "./pages/prf_saude/VinculoProfissional";
 import { Toaster } from "@/components/ui/sonner"; // Importe o Toaster
 import CuradoriaPacientes from "./pages//pacientes/CuradoriaPacientes";
 import LoginPage from "./pages/Login";
@@ -14,7 +14,7 @@ import ReplCurriculoPrf from "./pages/prf_saude/ReplCurriculoPrf";
 export type AutomationKey =
   | "home"
   | "login"
-  | "vinculo-medico"
+  | "vinculo-profissional"
   | "curadoria-prf-saude"
   | "curadoria-pacientes"
   | "repl-curriculo-prf"
@@ -36,8 +36,8 @@ function App() {
         );
       case "home":
         return <Home />;
-      case "vinculo-medico":
-        return <VinculoMedicoPage />;
+      case "vinculo-profissional":
+        return <VinculoProfissional />;
       case "repl-curriculo-prf":
         return <ReplCurriculoPrf />;
       case "curadoria-pacientes":

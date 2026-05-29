@@ -12,7 +12,7 @@ const Home: React.FC = () => {
         className="max-w-full h-auto max-h-24 mb-4"
       />
       <h1 className="text-3xl font-bold text-white">
-        Bem-vindo ao sistema, {auth.username}!
+        Bem-vindo ao sistema, {auth.nome_completo}!
       </h1>
       <p className="text-gray-400">Selecione uma opção no menu lateral.</p>
     </div>

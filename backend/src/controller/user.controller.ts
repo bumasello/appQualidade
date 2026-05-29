@@ -33,6 +33,7 @@ export class UserController {
         success: result.success,
         message: result.message,
         token: result.token,
+        nome_completo: result.nome_completo,
         primeiro_acesso: result.primeiro_acesso,
       });
     } catch (error) {

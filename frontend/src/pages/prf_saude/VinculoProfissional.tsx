@@ -1,5 +1,5 @@
 // src/pages/VinculoMedicoPage.tsx
-import React, { useState, useRef } from "react"; // Importe useRef
+import React, { useState, useRef, useEffect } from "react"; // Importe useRef
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,14 +15,25 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { MedicoApiResponse } from "@/types/medico";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const VinculoMedicoPage: React.FC = () => {
+  const { auth } = useAuth();
   // Estados para os campos do formulário
-  const [crm, setCrm] = useState("");
+  const [nr_doc, set_nr_doc] = useState("");
   const [uf, setUf] = useState("");
   const [cpf, setCpf] = useState("");
+  const [conselhos, setConselhos] = useState<string[]>([]);
+  const [selected_conselho, set_selected_conselho] = useState("");
 
-  // Estados para as informações do médico (retornadas pelo backend)
+  // Estados para as informações do profissional (retornadas pelo backend)
   const [nomeMedico, setNomeMedico] = useState("");
   const [cpfVinculado, setCpfVinculado] = useState("");
 
@@ -39,7 +50,7 @@ const VinculoMedicoPage: React.FC = () => {
 
   // Função para resetar o formulário para o estado inicial de busca
   const resetForm = () => {
-    setCrm("");
+    set_nr_doc("");
     setUf("");
     setCpf("");
     setNomeMedico("");
@@ -51,9 +62,37 @@ const VinculoMedicoPage: React.FC = () => {
     }
   };
 
-  // Função para buscar o médico no backend
-  const handleBuscarMedico = async () => {
-    if (!crm || !uf) {
+  useEffect(() => {
+    const fetch_conselhos = async () => {
+      const response = await fetch(
+        `http://localhost:8080/prf_saude/listar_conselhos`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+        },
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error("Erro na busca", {
+          description:
+            errorData.message ||
+            "Não foi possível encontrar o profissional. Verifique o CRM e a UF.",
+        });
+        return;
+      }
+
+      const responseData = await response.json();
+      setConselhos(responseData.conselhos);
+    };
+
+    fetch_conselhos();
+  }, []);
+
+  // Função para buscar o profissional no backend
+  const handle_buscar_profissional = async () => {
+    if (!nr_doc || !uf) {
       toast.error("Preenchimento obrigatório", {
         description: "Por favor, preencha o CRM e a UF.",
       });
@@ -61,13 +100,16 @@ const VinculoMedicoPage: React.FC = () => {
     }
 
     setIsLoading(true);
-    // console.log(`Buscando médico com CRM: ${crm} e UF: ${uf}`);
+    // console.log(`Buscando profissional com CRM: ${crm} e UF: ${uf}`);
 
     try {
       const response = await fetch(
-        `http://localhost:8080/prf_saude/buscar?crm=${crm}&uf=${uf}`,
+        `http://localhost:8080/prf_saude/buscar?nr_doc=${nr_doc}&uf=${uf}&cons=${selected_conselho}`,
         {
           method: "GET",
+          headers: {
+            Authorization: `Beater ${auth.token}`,
+          },
         },
       );
 
@@ -76,7 +118,7 @@ const VinculoMedicoPage: React.FC = () => {
         toast.error("Erro na busca", {
           description:
             errorData.message ||
-            "Não foi possível encontrar o médico. Verifique o CRM e a UF.",
+            "Não foi possível encontrar o profissional. Verifique o CRM, UF e CONSELHO.",
         });
         return;
       }
@@ -87,11 +129,11 @@ const VinculoMedicoPage: React.FC = () => {
       setCpfVinculado(responseData.data.CPF || "");
 
       setCardMode("display");
-      toast.success("Médico encontrado!", {
+      toast.success("Profissional encontrado!", {
         description: `Nome: ${responseData.data.NOME}`,
       });
     } catch (error) {
-      console.error("Erro ao buscar médico:", error);
+      console.error("Erro ao buscar profissional:", error);
       toast.error("Erro de conexão", {
         description:
           "Não foi possível conectar ao servidor. Tente novamente mais tarde.",
@@ -101,7 +143,7 @@ const VinculoMedicoPage: React.FC = () => {
     }
   };
 
-  // Função para simular o vínculo do médico (substituirá o fetch POST real)
+  // Função para simular o vínculo do profissional (substituirá o fetch POST real)
   const handleRealizarVinculo = async () => {
     if (!cpfVinculado && !cpf) {
       toast.error("Preenchimento obrigatório", {
@@ -122,11 +164,13 @@ const VinculoMedicoPage: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Beater ${auth.token}`,
         },
         body: JSON.stringify({
-          crm,
+          nr_doc,
           uf,
           cpf,
+          selected_conselho,
         }),
       });
 
@@ -135,22 +179,22 @@ const VinculoMedicoPage: React.FC = () => {
         toast.error("Erro na busca", {
           description:
             errorData.message ||
-            "Não foi possível encontrar o médico. Verifique o CRM e a UF.",
+            "Não foi possível encontrar o profissional. Verifique o CRM, UF e o CONSELHO.",
         });
         return;
       }
 
       toast.success("Vínculo Realizado!", {
-        description: `O médico ${nomeMedico} foi vinculado ao CPF ${
+        description: `O profissional ${nomeMedico} foi vinculado ao CPF ${
           cpfVinculado || cpf
         }.`,
         duration: 3000,
       });
       resetForm();
     } catch (error) {
-      console.error("Erro ao vincular médico:", error);
+      console.error("Erro ao vincular profissional:", error);
       toast.error("Erro inesperado", {
-        description: "Ocorreu um erro ao tentar vincular o médico.",
+        description: "Ocorreu um erro ao tentar vincular o profissional.",
       });
     } finally {
       setIsLoading(false);
@@ -232,10 +276,12 @@ const VinculoMedicoPage: React.FC = () => {
     <div className="flex flex-col items-center justify-center h-full p-8">
       <Card className="transition-all ease-in-out duration-300 w-full max-w-md p-6 bg-gray-900 text-white rounded-xl shadow-2xl hover:shadow-none">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Vínculo Médico</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Vínculo Profissional
+          </CardTitle>
           <CardDescription className="text-gray-400">
             {cardMode === "search"
-              ? "Informe o CRM e UF para buscar o médico."
+              ? "Informe o CRM e UF para buscar o profissional."
               : "Confirme os dados e vincule o CPF."}
           </CardDescription>
         </CardHeader>
@@ -248,8 +294,8 @@ const VinculoMedicoPage: React.FC = () => {
                   id="crm"
                   type="text"
                   placeholder="Ex: 12345"
-                  value={crm}
-                  onChange={(e) => setCrm(e.target.value)}
+                  value={nr_doc}
+                  onChange={(e) => set_nr_doc(e.target.value)}
                   className="bg-gray-800 border-gray-700 text-white focus:ring-blue-500 focus:border-blue-500 rounded-lg"
                 />
               </div>
@@ -265,19 +311,41 @@ const VinculoMedicoPage: React.FC = () => {
                   className="bg-gray-800 border-gray-700 text-white focus:ring-blue-500 focus:border-blue-500 rounded-lg"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="conselho">Conselho</Label>
+                <Select
+                  value={selected_conselho}
+                  onValueChange={set_selected_conselho}
+                >
+                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white rounded-lg">
+                    <SelectValue placeholder="Selecione o conselho" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700 text-white rounded-lg">
+                    {conselhos.map((c) => (
+                      <SelectItem
+                        key={c}
+                        value={c}
+                        className="text-white focus:bg-gray-700 focus:text-white"
+                      >
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </>
           ) : (
             <>
               <div className="space-y-2">
-                <Label>Nome do Médico</Label>
+                <Label>Nome do profissional</Label>
                 <p className="text-lg font-semibold text-blue-300">
                   {nomeMedico}
                 </p>
               </div>
               <div className="space-y-2">
-                <Label>CRM / UF</Label>
+                <Label>CRM / UF / CONSELHO</Label>
                 <p className="text-lg font-semibold">
-                  {crm} / {uf}
+                  {nr_doc} / {uf} / {selected_conselho}
                 </p>
               </div>
               <div className="space-y-2">
@@ -317,7 +385,7 @@ const VinculoMedicoPage: React.FC = () => {
                   Limpar
                 </Button>
                 <Button
-                  onClick={handleBuscarMedico}
+                  onClick={handle_buscar_profissional}
                   className="w-full bg-blue-600 hover:bg-blue-700"
                   disabled={isLoading || isBatchUploading}
                 >
@@ -327,7 +395,7 @@ const VinculoMedicoPage: React.FC = () => {
                       Carregando...
                     </>
                   ) : (
-                    "Buscar Médico"
+                    "Buscar Profissional"
                   )}
                 </Button>
               </div>
@@ -370,7 +438,9 @@ const VinculoMedicoPage: React.FC = () => {
                 className="w-full bg-green-600 hover:bg-green-700"
                 disabled={!!cpfVinculado}
               >
-                {cpfVinculado ? "CPF Já Vinculado" : "Realizar Vínculo Médico"}
+                {cpfVinculado
+                  ? "CPF Já Vinculado"
+                  : "Realizar Vínculo profissional"}
               </Button>
             </>
           )}

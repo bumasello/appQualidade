@@ -27,7 +27,7 @@ class UserService {
 
     try {
       const consulta_user = await conn.execute(
-        `select username, PASSWORD, PRIMEIRO_ACESSO from ${process.env.MDM_TBL_USUARIOS} where username = :username`,
+        `select ID, USERNAME, NOME_COMPLETO, PASSWORD, PRIMEIRO_ACESSO from ${process.env.MDM_TBL_USUARIOS} where username = :username`,
         { username: user.username },
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
@@ -39,11 +39,14 @@ class UserService {
         };
       }
 
-      const { USERNAME, PASSWORD, PRIMEIRO_ACESSO } = consulta_user.rows[0] as {
-        USERNAME: string;
-        PASSWORD: string;
-        PRIMEIRO_ACESSO: string;
-      };
+      const { ID, USERNAME, NOME_COMPLETO, PASSWORD, PRIMEIRO_ACESSO } =
+        consulta_user.rows[0] as {
+          ID: string;
+          USERNAME: string;
+          NOME_COMPLETO: string;
+          PASSWORD: string;
+          PRIMEIRO_ACESSO: string;
+        };
 
       const ok = await bcrypt.compare(user.pass, PASSWORD);
 
@@ -54,14 +57,19 @@ class UserService {
         };
       }
 
-      const token = jwt.sign({ USERNAME }, process.env.JWT_SECRET!, {
-        expiresIn: "8h",
-      });
+      const token = jwt.sign(
+        { user_id: Number(ID), user_name: USERNAME },
+        process.env.JWT_SECRET!,
+        {
+          expiresIn: "8h",
+        },
+      );
 
       return {
         success: true,
         message: "Login bem sucedido!",
         token: token,
+        nome_completo: NOME_COMPLETO,
         primeiro_acesso: PRIMEIRO_ACESSO,
       };
     } catch (error) {

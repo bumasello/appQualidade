@@ -69,7 +69,7 @@ const Aside: React.FC<AsideProps> = ({
           {/* Item de Profissionais de Saúde */}
           <AsideListItem
             icon={Stethoscope}
-            label="Prf Saúde"
+            label="Prf. Saúde"
             onSelectAutomation={onSelectAutomation}
             selectedAutomation={selectedAutomation}
             isCollapsed={isCollapsed}
