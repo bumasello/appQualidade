@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 interface AuthState {
   token: string | null;
   username: string | null;
+  nome_completo: string | null;
 }
 
 interface AuthContextType {
@@ -21,7 +22,11 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [auth, setAuth] = useState<AuthState>({ token: null, username: null });
+  const [auth, setAuth] = useState<AuthState>({
+    token: null,
+    username: null,
+    nome_completo: null,
+  });
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}

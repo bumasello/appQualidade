@@ -4,7 +4,8 @@ import { RequestHandler, Request, Response, NextFunction } from "express";
 import { AppError } from "../error/appError";
 
 export interface ReqUser extends Request {
-  userId: string;
+  user_id: string;
+  user_name: string;
 }
 
 const isAuth: RequestHandler = (
@@ -45,7 +46,8 @@ const isAuth: RequestHandler = (
       throw error;
     }
 
-    (req as ReqUser).userId = decoded.userId;
+    (req as ReqUser).user_id = decoded.user_id;
+    (req as ReqUser).user_name = decoded.user_name;
   } catch (error) {
     next(error);
   }

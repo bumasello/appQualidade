@@ -4,6 +4,7 @@ import ExcelService from "../service/excel.service"; // Importa a instância
 
 import type { Request, Response, NextFunction } from "express";
 import { Handler } from "../type/handler";
+import { ReqUser } from "../middleware/isAuth";
 
 export class PrfSaudeController {
   private prf_saude_service: PrfSaudeService;
@@ -14,25 +15,29 @@ export class PrfSaudeController {
     this.excelService = new ExcelService();
   }
 
-  public vinculaMedico = async (
+  public vincula_profissional = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const { crm, uf, cpf } = req.body;
+      const { nr_doc, uf, cpf, selected_conselho } = req.body;
+      const { user_id, user_name } = req as ReqUser;
 
-      if (!crm || !uf || !cpf) {
+      if (!nr_doc || !uf || !cpf || !selected_conselho) {
         throw new AppError(
-          "[vinculaMedico] Todos os campos são obrigatórios!",
+          "[vincula_profissional] Todos os campos são obrigatórios!",
           422,
         );
       }
 
-      const result = await this.prf_saude_service.realizaVinculoMedico(
-        crm,
+      const result = await this.prf_saude_service.realiza_vinculo_profissional(
+        nr_doc,
         uf,
         cpf,
+        selected_conselho,
+        user_id,
+        user_name,
       );
 
       if (result.success) {
@@ -47,43 +52,59 @@ export class PrfSaudeController {
     }
   };
 
-  public buscaMedico = async (
+  public busca_profissional = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const { crm, uf } = req.query;
+      const { nr_doc, uf, cons } = req.query;
 
-      if (!crm || !uf) {
+      if (!nr_doc || !uf || !cons) {
         throw new AppError(
-          "[buscaMedico] Todos os campos são obrigatórios!",
+          "[busca_profissional] Todos os campos são obrigatórios!",
           422,
         );
       }
 
-      let crmValue: string;
-      let ufValue: string;
+      let nr_dc_value: string;
+      let uf_value: string;
+      let cons_value: string;
 
-      if (typeof crm === "string") {
-        crmValue = crm;
-      } else if (Array.isArray(crm) && typeof crm[0] === "string") {
-        crmValue = crm[0];
+      if (typeof nr_doc === "string") {
+        nr_dc_value = nr_doc;
+      } else if (Array.isArray(nr_doc) && typeof nr_doc[0] === "string") {
+        nr_dc_value = nr_doc[0];
       } else {
-        throw new AppError("[buscaMedico] CRM inválido ou ausente!", 422);
+        throw new AppError(
+          "[busca_profissional] CRM inválido ou ausente!",
+          422,
+        );
       }
 
       if (typeof uf === "string") {
-        ufValue = uf;
+        uf_value = uf;
       } else if (Array.isArray(uf) && typeof uf[0] === "string") {
-        ufValue = uf[0];
+        uf_value = uf[0];
       } else {
-        throw new AppError("[buscaMedico] UF inválido ou ausente!", 422);
+        throw new AppError("[busca_profissional] UF inválido ou ausente!", 422);
       }
 
-      const result = await this.prf_saude_service.buscaMedico(
-        crmValue,
-        ufValue,
+      if (typeof cons === "string") {
+        cons_value = cons;
+      } else if (Array.isArray(cons) && typeof cons[0] === "string") {
+        cons_value = cons[0];
+      } else {
+        throw new AppError(
+          "[busca_profissional] Conselho inválido ou ausente!",
+          422,
+        );
+      }
+
+      const result = await this.prf_saude_service.busca_profissional(
+        nr_dc_value,
+        uf_value,
+        cons_value,
       );
 
       if (result.success) {
@@ -109,6 +130,7 @@ export class PrfSaudeController {
         );
       }
 
+      const { user_id, user_name } = req as ReqUser;
       const requiredHeaders = ["Nº conselho", "UF conselho", "CPF rec Federal"];
 
       const excelProcessResult = await this.excelService.processVinculoExcel(
@@ -127,6 +149,8 @@ export class PrfSaudeController {
       const batchProcessResult =
         await this.prf_saude_service.processaVinculoMedicoBatch(
           excelProcessResult.data,
+          user_id,
+          user_name,
         );
 
       const finalMessageParts: string[] = [];
@@ -184,6 +208,7 @@ export class PrfSaudeController {
   public replicaCurriculoPrf: Handler = async (req, res, next) => {
     try {
       const file = req.file as Express.Multer.File;
+      const { user_id, user_name } = req as ReqUser;
 
       if (!file) {
         throw new AppError("Arquivo para replica é obrigatório!", 400);
@@ -191,9 +216,25 @@ export class PrfSaudeController {
 
       const result = await this.prf_saude_service.replicaCurriculoPrf(
         file.buffer,
+        user_id,
+        user_name,
       );
       console.log(result);
       res.status(201).json({ ...result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public lista_conselhos: Handler = async (req, res, next) => {
+    try {
+      const result = await this.prf_saude_service.lista_conselhos();
+
+      if (!result.success) {
+        throw new AppError("Erro ao buscar conselhos!", 400);
+      }
+
+      return res.status(200).json({ conselhos: result.conselhos });
     } catch (error) {
       next(error);
     }

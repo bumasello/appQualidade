@@ -60,7 +60,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSucess }) => {
 
       const data = await res.json();
       if (data && data.token) {
-        setAuth({ token: data.token, username: username });
+        setAuth({
+          token: data.token,
+          username: username,
+          nome_completo: data.nome_completo,
+        });
         if (data.primeiro_acesso === 1) {
           setShowTrocaSenha(true);
         } else {
