@@ -1,10 +1,10 @@
-import "./oracledb-preload";
 import { config } from "dotenv";
-import { join } from "path";
 import oracledb from "oracledb";
+import { join } from "path";
 import App from "./App";
 import mdm_database from "./database/mdm_database";
 import qld_database from "./database/qld_database";
+import "./oracledb-preload";
 
 config({ path: join(__dirname, "../.env") });
 
@@ -23,6 +23,11 @@ const REQUIRED_ENV = [
   "QLD_TBL_MEDICOS_ONCO",
   "SMTP_HOST",
   "SMTP_PORT",
+  "MDM_TBL_EQUIPES",
+  "MDM_SEQ_EQUIPES",
+  "MDM_TBL_TELAS",
+  "MDM_SEQ_TELAS",
+  "MDM_TBL_EQUIPE_TELA",
 ];
 
 const app = new App(8080);

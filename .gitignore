@@ -8,3 +8,5 @@ dist/
 backend/dist/
 .claude/
 backend/.env
+backend/sql
+backend/backend

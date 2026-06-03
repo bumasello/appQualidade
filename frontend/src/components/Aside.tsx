@@ -1,17 +1,14 @@
 // src/components/Aside.tsx
-import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { Button } from "./ui/button";
 
-import { ChevronLeft, ChevronRight, Stethoscope, Hammer } from "lucide-react";
+import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
 
-import { AsideListItem } from "./AsideListItem";
-import {
-  prfSaudeSubItems,
-  utilitariosSubItems,
-} from "@/config/asideNavigation";
-
+import { menu_group } from "@/config/asideNavigation";
+import { useAuth } from "@/contexts/AuthContext";
 import type { AutomationKey } from "../App";
+import { AsideListItem } from "./AsideListItem";
 
 interface AsideProps {
   onSelectAutomation: (key: AutomationKey) => void;
@@ -24,6 +21,8 @@ const Aside: React.FC<AsideProps> = ({
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [openAccordionItem, setOpenAccordionItem] = useState<string>("");
+  const { auth } = useAuth();
+  const telas = auth.telas;
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -63,47 +62,44 @@ const Aside: React.FC<AsideProps> = ({
             Menu Principal
           </h2>
         )}
+        {menu_group.map((group) => {
+          const visiveis = group.sub_items.filter((s) =>
+            telas.includes(s.automationKey),
+          );
+          if (visiveis.length === 0) return null;
 
-        {/* Todos os itens agrupados para uniformizar espaçamento */}
-        <nav className="space-y-2 mb-4">
-          {/* Item de Profissionais de Saúde */}
-          <AsideListItem
-            icon={Stethoscope}
-            label="Prf. Saúde"
-            onSelectAutomation={onSelectAutomation}
-            selectedAutomation={selectedAutomation}
-            isCollapsed={isCollapsed}
-            accordionValue="item-prf-saude"
-            currentAccordionValue={openAccordionItem}
-            onAccordionValueChange={setOpenAccordionItem}
-            subItems={prfSaudeSubItems}
-          />
-          {/* Item Pacientes 
-          <AsideListItem
-            icon={FileUser}
-            label="Pacientes"
-            onSelectAutomation={onSelectAutomation}
-            selectedAutomation={selectedAutomation}
-            isCollapsed={isCollapsed}
-            accordionValue="item-pacientes"
-            currentAccordionValue={openAccordionItem}
-            onAccordionValueChange={setOpenAccordionItem}
-            subItems={pacienteSubItems}
-          />
-          */}
-          <AsideListItem
-            icon={Hammer}
-            label="Utilitários"
-            onSelectAutomation={onSelectAutomation}
-            selectedAutomation={selectedAutomation}
-            isCollapsed={isCollapsed}
-            accordionValue="item-utilitario"
-            currentAccordionValue={openAccordionItem}
-            onAccordionValueChange={setOpenAccordionItem}
-            subItems={utilitariosSubItems}
-          ></AsideListItem>
-        </nav>
+          return (
+            <AsideListItem
+              key={group.accordion_value}
+              icon={group.icon}
+              label={group.label}
+              accordionValue={group.accordion_value}
+              subItems={visiveis}
+              onSelectAutomation={onSelectAutomation}
+              selectedAutomation={selectedAutomation}
+              isCollapsed={isCollapsed}
+              currentAccordionValue={openAccordionItem}
+              onAccordionValueChange={setOpenAccordionItem}
+            />
+          );
+        })}
       </div>
+      {telas.includes("configuracoes") && (
+        <div className="p-4 overflow-hidden">
+          <button
+            className={cn(
+              "flex items-center w-full p-2 rounded-xl text-white cursor-pointer",
+              "transition-all duration-300 ease-in-out hover:bg-gray-700",
+              isCollapsed ? "justify-center" : "gap-2",
+              selectedAutomation === "configuracoes" && "bg-gray-700",
+            )}
+            onClick={() => onSelectAutomation("configuracoes")}
+          >
+            <Settings className="h-5 w-5 shrink-0" />
+            {!isCollapsed && <span>Configurações</span>}
+          </button>
+        </div>
+      )}
     </aside>
   );
 };

@@ -4,6 +4,8 @@ interface AuthState {
   token: string | null;
   username: string | null;
   nome_completo: string | null;
+  equipe: { id: number; nome: string } | null;
+  telas: string[];
 }
 
 interface AuthContextType {
@@ -26,6 +28,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     token: null,
     username: null,
     nome_completo: null,
+    equipe: null,
+    telas: [],
   });
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>

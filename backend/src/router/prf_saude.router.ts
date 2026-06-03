@@ -1,13 +1,19 @@
 import { Router } from "express";
-import { PrfSaudeController } from "../controller/prf_saude.controller";
 import upload from "../config/multerConfig";
+import { PrfSaudeController } from "../controller/prf_saude.controller";
+import hasAccess from "../middleware/hasAccess";
 import isAuth from "../middleware/isAuth";
 
 const router = Router();
 
 const prf_saude_controller = new PrfSaudeController();
 
-router.get("/buscar", isAuth, prf_saude_controller.busca_profissional);
+router.get(
+  "/buscar",
+  isAuth,
+  hasAccess("vinculo-profissional"),
+  prf_saude_controller.busca_profissional,
+);
 
 router.get("/listar_conselhos", isAuth, prf_saude_controller.lista_conselhos);
 

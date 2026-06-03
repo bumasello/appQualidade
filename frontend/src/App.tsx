@@ -2,14 +2,15 @@
 import { useState } from "react";
 import Aside from "./components/Aside";
 
-import VinculoProfissional from "./pages/prf_saude/VinculoProfissional";
 import { Toaster } from "@/components/ui/sonner"; // Importe o Toaster
-import CuradoriaPacientes from "./pages//pacientes/CuradoriaPacientes";
-import LoginPage from "./pages/Login";
 import { AuthProvider } from "./contexts/AuthContext";
+import CuradoriaPacientes from "./pages//pacientes/CuradoriaPacientes";
+import Configuracoes from "./pages/Configuracoes";
 import Home from "./pages/Home";
-import ComparadorPlanilhas from "./pages/utilitarios/ComparadorPlanilhas";
+import LoginPage from "./pages/Login";
 import ReplCurriculoPrf from "./pages/prf_saude/ReplCurriculoPrf";
+import VinculoProfissional from "./pages/prf_saude/VinculoProfissional";
+import ComparadorPlanilhas from "./pages/utilitarios/ComparadorPlanilhas";
 
 export type AutomationKey =
   | "home"
@@ -45,11 +46,7 @@ function App() {
       case "comparador-planilhas":
         return <ComparadorPlanilhas />;
       case "configuracoes":
-        return (
-          <div className="flex flex-col items-center justify-center h-full">
-            <h1 className="text-3xl font-bold text-white">Configurações</h1>
-          </div>
-        );
+        return <Configuracoes />;
       case "relatorios":
         return (
           <div className="flex flex-col items-center justify-center h-full">

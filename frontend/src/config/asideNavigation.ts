@@ -1,4 +1,12 @@
 import type { SubItem } from "@/types/navigation";
+import { Hammer, Stethoscope, type LucideIcon } from "lucide-react";
+
+export interface MenuGroup {
+  label: string;
+  icon: LucideIcon;
+  accordion_value: string;
+  sub_items: SubItem[];
+}
 
 export const prfSaudeSubItems: SubItem[] = [
   { label: "Vínculo Prf.", automationKey: "vinculo-profissional" },
@@ -15,4 +23,19 @@ export const utilitariosSubItems: SubItem[] = [
 
 export const testSubItems: SubItem[] = [
   { label: "Sub-item Teste", automationKey: "teste" },
+];
+
+export const menu_group: MenuGroup[] = [
+  {
+    label: "Prf. Saúde",
+    icon: Stethoscope,
+    accordion_value: "item-prf-saude",
+    sub_items: prfSaudeSubItems,
+  },
+  {
+    label: "Utilitários",
+    icon: Hammer,
+    accordion_value: "item-utilitario",
+    sub_items: utilitariosSubItems,
+  },
 ];

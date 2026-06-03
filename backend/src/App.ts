@@ -1,10 +1,12 @@
-import express from "express";
 import cors from "cors";
+import express from "express";
 import errorHandler from "./middleware/errorHandler";
 
-import PrfSaudeRouter from "./router/prf_saude.router";
-import UserRouter from "./router/user.router";
-import UtilitariosRouter from "./router/utilitários.router";
+import equipe_router from "./router/equipe.router";
+import prfsaude_router from "./router/prf_saude.router";
+import telas_router from "./router/tela.router";
+import user_router from "./router/user.router";
+import utilitarios_router from "./router/utilitários.router";
 
 class App {
   public app: express.Application;
@@ -29,9 +31,11 @@ class App {
   }
 
   private initRoute(): void {
-    this.app.use("/prf_saude", PrfSaudeRouter);
-    this.app.use("/user", UserRouter);
-    this.app.use("/utilitarios", UtilitariosRouter);
+    this.app.use("/prf_saude", prfsaude_router);
+    this.app.use("/user", user_router);
+    this.app.use("/utilitarios", utilitarios_router);
+    this.app.use("/tela", telas_router);
+    this.app.use("/equipe", equipe_router);
   }
 
   private initMiddleware(): void {

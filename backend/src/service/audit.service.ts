@@ -1,4 +1,3 @@
-import { AppError } from "../error/appError";
 import MDMService from "./mdm.service";
 
 interface RegistroAuditoria {
@@ -30,7 +29,10 @@ class AuditService {
         },
       );
     } catch (error) {
-      throw new AppError("Erro inesperado ao registrar auditoria", 400);
+      console.error(
+        "[auditoria] Falha ao registrar (ação seguiu normalmente):",
+        error,
+      );
     }
   }
 }
