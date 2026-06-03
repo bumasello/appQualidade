@@ -30,8 +30,7 @@ class UserService {
       const consulta_user = await this.mdm_service.query(
         `
         SELECT 
-          u.ID, u.USERNAME, u.NOME_COMPLETO, u.PASSWORD, u.PRIMEIRO_ACESSO, u.EQUIPE_ID, u.ATIVO
-          e.NOME as EQUIPE_NOME
+          u.ID, u.USERNAME, u.NOME_COMPLETO, u.PASSWORD, u.PRIMEIRO_ACESSO, u.EQUIPE_ID, u.ATIVO, e.NOME as EQUIPE_NOME
         FROM 
           ${process.env.MDM_TBL_USUARIOS} u
         LEFT JOIN
