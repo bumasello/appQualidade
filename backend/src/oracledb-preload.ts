@@ -1,4 +1,3 @@
-import Module from "module";
 import { appendFileSync } from "fs";
 
 function logToFile(message: string) {
@@ -15,7 +14,6 @@ function logToFile(message: string) {
 }
 
 logToFile("preload carregado");
-logToFile(`ORACLEDB_PATH=${process.env.ORACLEDB_PATH}`);
 
 process.on("uncaughtException", (err) => {
   logToFile(`uncaughtException: ${err.stack ?? err.message}`);
@@ -27,19 +25,3 @@ process.on("unhandledRejection", (reason) => {
   logToFile(`unhandledRejection: ${msg}`);
   process.exit(1);
 });
-
-const moduleAny = Module as unknown as {
-  _resolveFilename: (request: string, ...rest: unknown[]) => string;
-};
-
-const origResolve = moduleAny._resolveFilename;
-
-moduleAny._resolveFilename = function (request: string, ...rest: unknown[]) {
-  if (request === "oracledb" && process.env.ORACLEDB_PATH) {
-    logToFile(`resolvendo oracledb -> ${process.env.ORACLEDB_PATH}`);
-    return origResolve.call(this, process.env.ORACLEDB_PATH, ...rest);
-  }
-  return origResolve.call(this, request, ...rest);
-};
-
-logToFile("monkey-patch de _resolveFilename instalado");

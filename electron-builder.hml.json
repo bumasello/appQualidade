@@ -33,7 +33,7 @@
     },
     {
       "from": "backend/node_modules/oracledb",
-      "to": "oracledb",
+      "to": "app.asar.unpacked/backend/node_modules/oracledb",
       "filter": ["**/*"]
     }
   ],

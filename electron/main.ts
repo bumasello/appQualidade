@@ -91,10 +91,6 @@ function startBackend(logPath: string) {
     ? path.join(process.resourcesPath, "instantclient_19_30")
     : path.join(__dirname, "../resources/instantclient_19_30");
 
-  const oracledbPath = app.isPackaged
-    ? path.join(process.resourcesPath, "oracledb")
-    : "";
-
   fs.writeFileSync(
     logPath,
     `=== Iniciando ${new Date().toISOString()} ===\n` +
@@ -102,7 +98,6 @@ function startBackend(logPath: string) {
       `process.resourcesPath: ${process.resourcesPath}\n` +
       `backendPath: ${backendPath} (exists=${fs.existsSync(backendPath)})\n` +
       `instantClientPath: ${instantClientPath} (exists=${fs.existsSync(instantClientPath)})\n` +
-      `oracledbPath: ${oracledbPath} (exists=${oracledbPath ? fs.existsSync(oracledbPath) : "n/a"})\n` +
       `--- output do backend abaixo ---\n`,
   );
 
@@ -128,7 +123,6 @@ function startBackend(logPath: string) {
       ...process.env,
       PORT: backendPort.toString(),
       ORACLE_CLIENT_LIB_DIR: instantClientPath,
-      ORACLEDB_PATH: oracledbPath,
       LOG_FILE: logPath,
     },
   });
