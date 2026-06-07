@@ -1,15 +1,15 @@
-import { cn } from "@/lib/utils";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 import { AsideListItemContent } from "./AsideListItemContent";
 
 import type { AutomationKey } from "@/App";
-import type { LucideIcon } from "lucide-react";
 import type { SubItem } from "@/types/navigation";
+import type { LucideIcon } from "lucide-react";
 
 interface AsideListItemProps {
   icon: LucideIcon;
@@ -40,32 +40,31 @@ export const AsideListItem: React.FC<AsideListItemProps> = ({
   );
 
   return (
-    <div
-      className={cn(
-        "flex items-center w-full p-2 rounded-xl transition-all duration-300 ease-in-out",
-        isCollapsed && isAccordionParentSelected ? " text-white" : "",
-        isCollapsed && "cursor-default",
-      )}
-    >
+    <div className="flex items-center w-full p-2 rounded-xl">
       <Icon
         className={cn(
           "h-5 w-5 shrink-0",
           isCollapsed && isAccordionParentSelected && "text-blue-400",
         )}
       />
-      {!isCollapsed && (
+      <div
+        className={cn(
+          "w-full ml-2 overflow-hidden transition-opacity duration-300",
+          isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100",
+        )}
+      >
         <Accordion
           type="single"
           collapsible
-          value={currentAccordionValue}
+          value={isCollapsed ? "" : currentAccordionValue}
           onValueChange={onAccordionValueChange}
-          className="w-full ml-2"
+          className="w-full"
         >
           <AccordionItem value={accordionValue}>
             <AccordionTrigger
               className={cn(
-                "flex items-center justify-between w-full p-2 rounded-xl cursor-pointer transition-all duration-300 ease-in-out",
-                !isCollapsed && isAccordionParentSelected ? "bg-gray-700" : "",
+                "flex items-center justify-between w-full p-2 rounded-xl cursor-pointer transition-colors duration-300",
+                isAccordionParentSelected ? "bg-gray-700" : "",
               )}
             >
               <span className="whitespace-nowrap">{label}</span>
@@ -83,7 +82,7 @@ export const AsideListItem: React.FC<AsideListItemProps> = ({
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-      )}
+      </div>
     </div>
   );
 };

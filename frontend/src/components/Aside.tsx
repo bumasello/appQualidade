@@ -58,7 +58,12 @@ const Aside: React.FC<AsideProps> = ({
 
       <div className="flex-1 p-4 overflow-hidden">
         {!isCollapsed && (
-          <h2 className="text-xl text-center font-semibold mb-4 whitespace-nowrap">
+          <h2
+            className={cn(
+              "text-xl text-center font-semibold whitespace-nowrap overflow-hidden transition-all duration-300",
+              isCollapsed ? "opacity-0 h-0 mb-0" : "opacity-100 h-7 mb-4",
+            )}
+          >
             Menu Principal
           </h2>
         )}
@@ -88,15 +93,21 @@ const Aside: React.FC<AsideProps> = ({
         <div className="p-4 overflow-hidden">
           <button
             className={cn(
-              "flex items-center w-full p-2 rounded-xl text-white cursor-pointer",
-              "transition-all duration-300 ease-in-out hover:bg-gray-700",
-              isCollapsed ? "justify-center" : "gap-2",
+              "flex items-center w-full p-2 rounded-xl text-white cursor-pointer gap-2",
+              "transition-colors duration-300 hover:bg-gray-700",
               selectedAutomation === "configuracoes" && "bg-gray-700",
             )}
             onClick={() => onSelectAutomation("configuracoes")}
           >
             <Settings className="h-5 w-5 shrink-0" />
-            {!isCollapsed && <span>Configurações</span>}
+            <span
+              className={cn(
+                "whitespace-nowrap transition-opacity duration-300",
+                isCollapsed ? "opacity-0" : "opacity-100",
+              )}
+            >
+              Configurações
+            </span>
           </button>
         </div>
       )}
