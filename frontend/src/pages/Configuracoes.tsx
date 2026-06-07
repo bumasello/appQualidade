@@ -1,240 +1,35 @@
 import Equipes from "@/components/cards/EquipesCard";
 import Usuarios from "@/components/cards/UsuariosCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/AuthContext";
 import type React from "react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-
-interface Equipe {
-  ID: number;
-  NOME: string;
-  DESCRICAO: string | null;
-  ATIVO: number;
-}
-
-interface Tela {
-  ID: number;
-  CHAVE: string;
-  NOME: string;
-  DESCRICAO: string | null;
-  ATIVO: number;
-}
-
-interface Usuario {
-  ID: number;
-  NOME_COMPLETO: string;
-  USERNAME: string;
-  EQUIPE_ID: number | null;
-  EQUIPE_NOME: string | null;
-  ATIVO: number;
-}
-
-const API = "http://localhost:8080";
 
 const Configuracoes: React.FC = () => {
-  const { auth } = useAuth();
-  const [equipes, set_equipes] = useState<Equipe[]>([]);
-  const [telas, set_telas] = useState<Tela[]>([]);
-  const [usuarios, set_usuarios] = useState<Usuario[]>([]);
-  const [selected_equipe_id, set_selected_equipe_id] = useState<number | null>(
-    null,
-  );
-  const [equipe_tela_ids, set_equipe_tela_ids] = useState<number[]>([]);
-  const [nova_equipe_nome, set_nova_equipe_nome] = useState("");
-  const [nova_equipe_descricao, set_nova_equipe_descricao] = useState("");
-  const [novo_nome, set_novo_nome] = useState("");
-  const [novo_username, set_novo_username] = useState("");
-  const [novo_email, set_novo_email] = useState("");
-  const [novo_equipe_id, set_novo_equipe_id] = useState("");
-
-  const authHeaders = { Authorization: `Bearer ${auth.token}` };
-
-  const alterar_status_usuario = async (user_id: number, ativo: number) => {
-    const res = await fetch(`${API}/user/${user_id}/status`, {
-      method: "PATCH",
-      headers: { ...authHeaders, "Content-Type": "application/json" },
-      body: JSON.stringify({ ativo }),
-    });
-
-    if (res.ok) {
-      toast.success(ativo === 1 ? "Usuário ativado!" : "Usuário desativado!");
-      carregar_usuarios();
-    } else {
-      toast.error("Erro ao alterar o status.");
-    }
-  };
-
-  const carregar_usuarios = async () => {
-    const res = await fetch(`${API}/user/listar`, { headers: authHeaders });
-    if (res.ok) set_usuarios((await res.json()).usuarios);
-  };
-
-  const criar_usuario = async () => {
-    if (
-      !novo_nome.trim() ||
-      !novo_username.trim() ||
-      !novo_email.trim() ||
-      !novo_equipe_id
-    ) {
-      toast.error("Preencha todos os campos do usuário.");
-      return;
-    }
-
-    const res = await fetch(`${API}/user/create_user`, {
-      method: "POST",
-      headers: { ...authHeaders, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nome_completo: novo_nome,
-        username: novo_username,
-        email: novo_email,
-        equipe_id: Number(novo_equipe_id),
-      }),
-    });
-
-    if (res.ok) {
-      toast.success("Usuário criado!");
-      set_novo_nome("");
-      set_novo_username("");
-      set_novo_email("");
-      set_novo_equipe_id("");
-      carregar_usuarios();
-    } else {
-      toast.error("Erro ao criar usuário.");
-    }
-  };
-
-  const alterar_equipe_usuario = async (user_id: number, equipe_id: number) => {
-    const res = await fetch(`${API}/user/${user_id}/equipe`, {
-      method: "PATCH",
-      headers: { ...authHeaders, "Content-Type": "application/json" },
-      body: JSON.stringify({ equipe_id }),
-    });
-
-    if (res.ok) {
-      toast.success("Equipe atualizada!");
-      carregar_usuarios();
-    } else {
-      toast.error("Erro ao alterar a equipe.");
-    }
-  };
-
-  const carregar_equipes = async () => {
-    const res = await fetch(`${API}/equipe/listar`, { headers: authHeaders });
-    if (res.ok) set_equipes((await res.json()).equipes);
-  };
-
-  const selecionar_equipe = async (id: number) => {
-    const res = await fetch(`${API}/equipe/${id}/telas`, {
-      headers: authHeaders,
-    });
-    if (!res.ok) {
-      toast.error("Erro ao carregar permissões da equipe.");
-      return;
-    }
-    set_selected_equipe_id(id);
-    set_equipe_tela_ids((await res.json()).tela_ids);
-  };
-
-  const toggle_tela = (tela_id: number) => {
-    set_equipe_tela_ids((atual) =>
-      atual.includes(tela_id)
-        ? atual.filter((id) => id !== tela_id)
-        : [...atual, tela_id],
-    );
-  };
-
-  const salva_permissoes = async () => {
-    if (selected_equipe_id == null) return;
-
-    const res = await fetch(`${API}/equipe/${selected_equipe_id}/telas`, {
-      method: "PUT",
-      headers: { ...authHeaders, "Content-Type": "application/json" },
-      body: JSON.stringify({ tela_ids: equipe_tela_ids }),
-    });
-
-    if (res.ok) toast.success("Permissões atualizadas!");
-    else toast.error("Erro ao salvar permissões.");
-  };
-
-  const criar_equipe = async () => {
-    if (!nova_equipe_nome.trim()) {
-      toast.error("Informe o nome da equipe.");
-      return;
-    }
-
-    const res = await fetch(`${API}/equipe/criar`, {
-      method: "POST",
-      headers: { ...authHeaders, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nome: nova_equipe_nome,
-        descricao: nova_equipe_descricao,
-      }),
-    });
-
-    if (res.ok) {
-      toast.success("Equipe criada!");
-      set_nova_equipe_nome("");
-      set_nova_equipe_descricao("");
-      carregar_equipes();
-    } else {
-      toast.error("Erro ao criar equipe.");
-    }
-  };
-
-  useEffect(() => {
-    const carregar = async () => {
-      try {
-        const [eq, tl, us] = await Promise.all([
-          fetch(`${API}/equipe/listar`, { headers: authHeaders }),
-          fetch(`${API}/tela/listar`, { headers: authHeaders }),
-          fetch(`${API}/user/listar`, { headers: authHeaders }),
-        ]);
-
-        if (!eq.ok || !tl.ok || !us.ok) {
-          toast.error("Erro ao carregar dados de configuração.");
-          return;
-        }
-
-        set_equipes((await eq.json()).equipes);
-        set_telas((await tl.json()).telas);
-        set_usuarios((await us.json()).usuarios);
-      } catch (error) {
-        toast.error("Erro de conexão com o servidor.");
-      }
-    };
-
-    carregar();
-  }, []);
-
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
-      <div className="space-y-6 max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold">Configurações</h1>
+      <h1 className="text-3xl font-bold">Configurações</h1>
 
-        <Tabs defaultValue="equipes">
-          <TabsList className="bg-gray-900 border border-gray-700 w-full">
-            <TabsTrigger
-              value="equipes"
-              className="transition-colors duration-200 flex-1 cursor-pointer text-gray-300 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-            >
-              Equipes & Permissões
-            </TabsTrigger>
-            <TabsTrigger
-              value="usuarios"
-              className="transition-colors duration-600 flex-1 cursor-pointer text-gray-300 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-            >
-              Usuários
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="usuarios" className="animate-fade-in">
-            <Usuarios />
-          </TabsContent>
-          <TabsContent value="equipes" className="animate-fade-in">
-            <Equipes />
-          </TabsContent>
-        </Tabs>
-      </div>
+      <Tabs defaultValue="equipes">
+        <TabsList className="bg-gray-900 border border-gray-700 w-full">
+          <TabsTrigger
+            value="equipes"
+            className="transition-colors duration-200 flex-1 cursor-pointer text-gray-300 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+          >
+            Equipes & Permissões
+          </TabsTrigger>
+          <TabsTrigger
+            value="usuarios"
+            className="transition-colors duration-200 flex-1 cursor-pointer text-gray-300 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+          >
+            Usuários
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="usuarios" className="animate-fade-in">
+          <Usuarios />
+        </TabsContent>
+        <TabsContent value="equipes" className="animate-fade-in">
+          <Equipes />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

@@ -24,22 +24,12 @@ interface Tela {
   ATIVO: number;
 }
 
-interface Usuario {
-  ID: number;
-  NOME_COMPLETO: string;
-  USERNAME: string;
-  EQUIPE_ID: number | null;
-  EQUIPE_NOME: string | null;
-  ATIVO: number;
-}
-
 const API = "http://localhost:8080";
 
 const Equipes: React.FC = () => {
   const { auth } = useAuth();
   const [equipes, set_equipes] = useState<Equipe[]>([]);
   const [telas, set_telas] = useState<Tela[]>([]);
-  const [usuarios, set_usuarios] = useState<Usuario[]>([]);
   const [selected_equipe_id, set_selected_equipe_id] = useState<number | null>(
     null,
   );
@@ -128,7 +118,6 @@ const Equipes: React.FC = () => {
 
         set_equipes((await eq.json()).equipes);
         set_telas((await tl.json()).telas);
-        set_usuarios((await us.json()).usuarios);
       } catch (error) {
         toast.error("Erro de conexão com o servidor.");
       }

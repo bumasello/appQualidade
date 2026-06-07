@@ -22,14 +22,6 @@ interface Equipe {
   ATIVO: number;
 }
 
-interface Tela {
-  ID: number;
-  CHAVE: string;
-  NOME: string;
-  DESCRICAO: string | null;
-  ATIVO: number;
-}
-
 interface Usuario {
   ID: number;
   NOME_COMPLETO: string;
@@ -44,7 +36,6 @@ const API = "http://localhost:8080";
 const Usuarios: React.FC = () => {
   const { auth } = useAuth();
   const [equipes, set_equipes] = useState<Equipe[]>([]);
-  const [telas, set_telas] = useState<Tela[]>([]);
   const [usuarios, set_usuarios] = useState<Usuario[]>([]);
   const [novo_nome, set_novo_nome] = useState("");
   const [novo_username, set_novo_username] = useState("");
@@ -122,11 +113,6 @@ const Usuarios: React.FC = () => {
     }
   };
 
-  const carregar_equipes = async () => {
-    const res = await fetch(`${API}/equipe/listar`, { headers: authHeaders });
-    if (res.ok) set_equipes((await res.json()).equipes);
-  };
-
   useEffect(() => {
     const carregar = async () => {
       try {
@@ -142,7 +128,6 @@ const Usuarios: React.FC = () => {
         }
 
         set_equipes((await eq.json()).equipes);
-        set_telas((await tl.json()).telas);
         set_usuarios((await us.json()).usuarios);
       } catch (error) {
         toast.error("Erro de conexão com o servidor.");
