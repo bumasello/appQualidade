@@ -128,8 +128,6 @@ const Equipes: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold">Configurações</h1>
-
       <Card className="bg-gray-900 text-white border-gray-700">
         <CardHeader>
           <CardTitle>Equipes &amp; Permissões</CardTitle>
