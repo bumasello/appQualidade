@@ -21,6 +21,10 @@ export const utilitariosSubItems: SubItem[] = [
   { label: "Comparador de Planilhas", automationKey: "comparador-planilhas" },
 ];
 
+export const coberturaSubItems: SubItem[] = [
+  { label: "Automação PPP", automationKey: "automacao-ppp" },
+];
+
 export const testSubItems: SubItem[] = [
   { label: "Sub-item Teste", automationKey: "teste" },
 ];
@@ -37,5 +41,11 @@ export const menu_group: MenuGroup[] = [
     icon: Hammer,
     accordion_value: "item-utilitario",
     sub_items: utilitariosSubItems,
+  },
+  {
+    label: "Coberturas",
+    icon: Hammer,
+    accordion_value: "item-cobertura",
+    sub_items: coberturaSubItems,
   },
 ];

@@ -6,7 +6,12 @@ import mdm_database from "./database/mdm_database";
 import qld_database from "./database/qld_database";
 import "./oracledb-preload";
 
-config({ path: join(__dirname, "../.env") });
+const APP_ENV = process.env.APP_ENV;
+const envPath = APP_ENV
+  ? join(__dirname, "../..", `.env.${APP_ENV}`) // raiz: .env.hml / .env.prd
+  : join(__dirname, "../.env"); // backend/.env (default em produção)
+config({ path: envPath });
+console.log(`Carregando env: ${envPath}`);
 
 const REQUIRED_ENV = [
   "MDM_USER",

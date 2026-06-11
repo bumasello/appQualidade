@@ -11,11 +11,13 @@
     "build:backend": "esbuild backend/src/server.ts --bundle --platform=node --external:oracledb --outfile=backend/dist/server.js",
     "dev:electron": "bun run build:electron && bun run build:react && bun run build:backend && electron dist-electron/main.cjs",
     "dev:react": "cd frontend && bun run dev",
-    "dev:backend": "cd backend && bun run dev",
+    "dev:backend": "cd backend && bun run dev:hml",
+    "dev:backend:prd": "cd backend && bun run dev:prd",
     "build": "bun run build:electron && bun run build:react && bun run build:backend",
     "dist": "bun run build && electron-builder --windows",
     "dist:prd": "bun run build && electron-builder --windows --config electron-builder.prd.json --publish always",
-    "dist:hml": "bun run build && electron-builder --windows --config electron-builder.hml.json --publish always"
+    "dist:hml": "bun run build && electron-builder --windows --config electron-builder.hml.json --publish always",
+    "migrate": "bun backend/src/migrate.ts"
   },
   "dependencies": {
     "baseline-browser-mapping": "^2.10.32",

@@ -23,6 +23,7 @@ export type AutomationKey =
   | "relatorios"
   | "pacientes"
   | "comparador-planilhas"
+  | "automacao-ppp"
   | "teste";
 
 function App() {
