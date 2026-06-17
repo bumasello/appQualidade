@@ -2,11 +2,12 @@ import cors from "cors";
 import express from "express";
 import errorHandler from "./middleware/errorHandler";
 
+import coberturas_router from "./router/cobertura.router";
 import equipe_router from "./router/equipe.router";
 import prfsaude_router from "./router/prf_saude.router";
 import telas_router from "./router/tela.router";
 import user_router from "./router/user.router";
-import utilitarios_router from "./router/utilitários.router";
+import utilitarios_router from "./router/utilitarios.router";
 
 class App {
   public app: express.Application;
@@ -36,6 +37,7 @@ class App {
     this.app.use("/utilitarios", utilitarios_router);
     this.app.use("/tela", telas_router);
     this.app.use("/equipe", equipe_router);
+    this.app.use("/coberturas", coberturas_router);
   }
 
   private initMiddleware(): void {

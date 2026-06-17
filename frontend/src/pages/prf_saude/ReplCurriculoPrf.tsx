@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,12 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 import { Label } from "@radix-ui/react-label";
 import { Loader2, X } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const ReplCurriculoPrf: React.FC = () => {
@@ -85,7 +85,7 @@ const ReplCurriculoPrf: React.FC = () => {
             Replicar Curriculo Profissional
           </CardTitle>
           <CardDescription className="text-gray-400">
-            Faça o upload de uma planilha para replicar.
+            Faça o upload de uma planilha para replicar
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

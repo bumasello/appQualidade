@@ -1,5 +1,5 @@
 import type { SubItem } from "@/types/navigation";
-import { Hammer, Stethoscope, type LucideIcon } from "lucide-react";
+import { Grid2x2, Hammer, Stethoscope, type LucideIcon } from "lucide-react";
 
 export interface MenuGroup {
   label: string;
@@ -21,8 +21,8 @@ export const utilitariosSubItems: SubItem[] = [
   { label: "Comparador de Planilhas", automationKey: "comparador-planilhas" },
 ];
 
-export const coberturaSubItems: SubItem[] = [
-  { label: "Automação PPP", automationKey: "automacao-ppp" },
+export const cobertura_subitems: SubItem[] = [
+  { label: "Importação PPP", automationKey: "importacao-ppp" },
 ];
 
 export const testSubItems: SubItem[] = [
@@ -44,8 +44,8 @@ export const menu_group: MenuGroup[] = [
   },
   {
     label: "Coberturas",
-    icon: Hammer,
+    icon: Grid2x2,
     accordion_value: "item-cobertura",
-    sub_items: coberturaSubItems,
+    sub_items: cobertura_subitems,
   },
 ];

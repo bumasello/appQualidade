@@ -5,6 +5,7 @@ import Aside from "./components/Aside";
 import { Toaster } from "@/components/ui/sonner"; // Importe o Toaster
 import { AuthProvider } from "./contexts/AuthContext";
 import CuradoriaPacientes from "./pages//pacientes/CuradoriaPacientes";
+import Importacao from "./pages/coberturas/Importacao";
 import Configuracoes from "./pages/Configuracoes";
 import Home from "./pages/Home";
 import LoginPage from "./pages/Login";
@@ -23,7 +24,7 @@ export type AutomationKey =
   | "relatorios"
   | "pacientes"
   | "comparador-planilhas"
-  | "automacao-ppp"
+  | "importacao-ppp"
   | "teste";
 
 function App() {
@@ -48,12 +49,8 @@ function App() {
         return <ComparadorPlanilhas />;
       case "configuracoes":
         return <Configuracoes />;
-      case "relatorios":
-        return (
-          <div className="flex flex-col items-center justify-center h-full">
-            <h1 className="text-3xl font-bold text-white">Relatórios</h1>
-          </div>
-        );
+      case "importacao-ppp":
+        return <Importacao />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-full">

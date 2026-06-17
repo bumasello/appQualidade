@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,16 +7,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 import { Label } from "@radix-ui/react-label";
+import { Loader2, X } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
-import * as XLSX from "xlsx";
-import { Button } from "@/components/ui/button";
-import { Loader2, X } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 interface ComparadorResult {
   stats: {
