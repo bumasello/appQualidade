@@ -7,6 +7,14 @@
 [System.Environment]::SetEnvironmentVariable("CSC_IDENTITY_AUTO_DISCOVERY", "false", "User")
 ```
 
+Depois **feche e reabra o terminal** — variável de usuário só vale em sessão nova. Para conferir sem expor o token:
+
+```powershell
+$env:GH_TOKEN.Length
+```
+
+O token é um *personal access token (classic)* com escopo `repo`.
+
 ## Estratégia de branches
 
 | Branch   | Propósito                           |
@@ -14,6 +22,39 @@
 | `master` | Código estável, fonte do PRD        |
 | `hml`    | Staging — equipe testa aqui         |
 | `dev-*`  | Desenvolvimento de features e fixes |
+
+## ⛔ Regra de ouro: a branch e o comando têm que casar
+
+O `dist` empacota **o que está no diretório**, não o que está na branch que você acha que está. Quem decide o canal é o `--config`, e ele não valida nada.
+
+| Branch   | Comando            | Config                      | Canal    | Asset gerado                        |
+| -------- | ------------------ | --------------------------- | -------- | ----------------------------------- |
+| `master` | `bun run dist:prd` | `electron-builder.prd.json` | `latest` | `App Qualidade Setup X.Y.Z.exe`     |
+| `hml`    | `bun run dist:hml` | `electron-builder.hml.json` | `beta`   | `App Qualidade HML Setup X.Y.Z.exe` |
+
+**Rodar `dist:prd` com o `hml` no diretório publica código de homologação como release estável de produção.** Todo app PRD recebe aquilo como atualização automática — inclusive código que depende de tabelas que só existem em HML, mas apontando para o banco de produção. Isso já aconteceu; veja [Se publicou errado](#se-publicou-errado--como-reverter).
+
+**Nunca** mantenha duas cópias do repositório para "facilitar". Use uma só e troque com `git checkout`.
+
+## Conferência obrigatória antes de qualquer `dist`
+
+Rode isto **imediatamente antes** do `dist`, na pasta do projeto:
+
+```powershell
+git status
+git log --oneline -1
+type package.json | Select-String '"version"' | Select-Object -First 1
+Test-Path backend\src\migrate.ts
+```
+
+Leitura do resultado:
+
+| Vai rodar  | `git status`              | versão      | `Test-Path backend\src\migrate.ts` |
+| ---------- | ------------------------- | ----------- | ---------------------------------- |
+| `dist:prd` | `On branch master`, limpo | sem `-beta` | **`False`**                        |
+| `dist:hml` | `On branch hml`, limpo    | com `-beta` | **`True`**                         |
+
+O `migrate.ts` serve de sentinela: ele só existe no `hml`. Se o resultado não bater com a tabela, **pare** — o diretório está com a branch errada.
 
 ## Fluxo completo
 
@@ -67,6 +108,15 @@ Betas **seguintes da mesma mudança** (ajustes durante o teste) só incrementam 
 npm version prerelease --preid=beta  # 1.6.0-beta.0 → 1.6.0-beta.1
 ```
 
+Se as dependências mudaram entre as branches, reinstale antes de empacotar:
+
+```sh
+bun install
+cd frontend && bun install && cd ..
+```
+
+Agora faça a [conferência obrigatória](#conferência-obrigatória-antes-de-qualquer-dist) — esperado: branch `hml`, versão com `-beta`, sentinela `True`. Só então:
+
 ```sh
 git push && git push --tags
 bun run dist:hml
@@ -80,6 +130,18 @@ git merge dev-nome-da-feature
 npm version patch    # correção de bug:     1.1.0 → 1.1.1
 # ou
 npm version minor    # nova funcionalidade: 1.1.0 → 1.2.0
+```
+
+Se veio do `hml` no mesmo diretório, reinstale as dependências (o `hml` costuma ter pacotes a mais):
+
+```sh
+bun install
+cd frontend && bun install && cd ..
+```
+
+Faça a [conferência obrigatória](#conferência-obrigatória-antes-de-qualquer-dist) — esperado: branch `master`, versão **sem** `-beta`, sentinela `False`. Só então:
+
+```sh
 git push
 git push --tags
 bun run dist:prd
@@ -97,6 +159,39 @@ bun run dist:hml
 ```
 
 O bump (`npm version prerelease`) só acontece quando há feature nova entrando no HML para ser testada antes do PRD.
+
+## Depois de publicar: confira o canal
+
+Leva 5 segundos e pega publicação no canal errado antes dos usuários:
+
+```sh
+gh release view vX.Y.Z --json isPrerelease,assets --jq '{prerelease:.isPrerelease, assets:[.assets[].name]}'
+```
+
+| Publicou | `prerelease` | Assets devem conter             |
+| -------- | ------------ | ------------------------------- |
+| PRD      | `false`      | `latest.yml`, nome **sem** `HML` |
+| HML      | `true`       | `beta.yml`, nome **com** `HML`   |
+
+Se vier trocado, vá direto para a seção abaixo.
+
+## Se publicou errado — como reverter
+
+Aconteça o que acontecer, **primeiro estanque, depois investigue**. Enquanto a release estiver no ar, os apps estão baixando.
+
+```sh
+# 1. derruba a release (remove os assets e o latest.yml/beta.yml)
+gh release delete vX.Y.Z --yes
+
+# 2. remove a tag do remoto, senão o updater acha a tag no feed
+#    e falha com 404 procurando o arquivo de canal que não existe mais
+git push origin :refs/tags/vX.Y.Z
+
+# 3. confirme quem voltou a ser a Latest
+gh release list --limit 5
+```
+
+Depois disso, avise quem usa o ambiente afetado: quem já atualizou continua na versão errada e precisa reinstalar pelo instalador correto.
 
 ## Convenção de versão
 
@@ -180,3 +275,4 @@ refactor(backend): extrai QLDService e QLDDatabase como módulos separados
 - O `dist:hml` publica como **pre-release** — só apps HML recebem a atualização.
 - HML e PRD compartilham o mesmo repo de releases → a versão da beta precisa **antecipar** a de PRD, senão o app de HML atualiza pra trás. Veja [Versionamento HML × PRD](#versionamento-hml--prd).
 - Nunca faça merge de `hml` para `master`. O merge sempre vai de `dev-*` para `master` diretamente.
+- **Este arquivo deve ser idêntico em `master` e `hml`.** Ele já ficou defasado no `master` uma vez, e o guia incompleto contribuiu para uma publicação no canal errado. Ao alterá-lo, leve a mudança para as duas branches.
