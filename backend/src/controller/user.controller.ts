@@ -93,7 +93,6 @@ export class UserController {
         );
 
       const pass = randomInt(100_000, 1_000_000).toString();
-      console.log(pass);
 
       const { EMAIL } = await this.userService.reset_password({
         username,

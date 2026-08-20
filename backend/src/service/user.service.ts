@@ -246,7 +246,8 @@ class UserService {
         EMAIL: EMAIL,
       };
     } catch (error) {
-      console.error("[resetPassword] Erro ao resetar a senha do usuário!");
+      if (error instanceof AppError) throw error;
+      console.error("[resetPassword] Erro ao resetar a senha do usuário!", error);
       throw new Error("Erro ao resetar a senha do usuário!");
     }
   }
