@@ -19,8 +19,21 @@ class App {
   }
 
   public listen(): void {
-    this.app.listen(this.port, () => {
+    const server = this.app.listen(this.port, () => {
       console.log("Api on air.");
+    });
+
+    server.on("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        console.error(
+          `ERRO FATAL: a porta ${this.port} ja esta em uso. ` +
+            "Provavelmente o outro ambiente (PRD ou HML) esta aberto. " +
+            "Feche o outro app e abra este novamente.",
+        );
+      } else {
+        console.error(`ERRO FATAL ao subir o servidor: ${err.message}`);
+      }
+      process.exit(1);
     });
   }
 

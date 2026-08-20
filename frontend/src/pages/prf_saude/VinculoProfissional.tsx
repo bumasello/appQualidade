@@ -1,4 +1,5 @@
 // src/pages/VinculoMedicoPage.tsx
+import { API_BASE } from "@/config/api";
 import React, { useState, useRef, useEffect } from "react"; // Importe useRef
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,7 +66,7 @@ const VinculoMedicoPage: React.FC = () => {
   useEffect(() => {
     const fetch_conselhos = async () => {
       const response = await fetch(
-        `http://localhost:8080/prf_saude/listar_conselhos`,
+        `${API_BASE}/prf_saude/listar_conselhos`,
         {
           method: "GET",
           headers: {
@@ -104,7 +105,7 @@ const VinculoMedicoPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/prf_saude/buscar?nr_doc=${nr_doc}&uf=${uf}&cons=${selected_conselho}`,
+        `${API_BASE}/prf_saude/buscar?nr_doc=${nr_doc}&uf=${uf}&cons=${selected_conselho}`,
         {
           method: "GET",
           headers: {
@@ -160,7 +161,7 @@ const VinculoMedicoPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/prf_saude/vincular`, {
+      const response = await fetch(`${API_BASE}/prf_saude/vincular`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -229,7 +230,7 @@ const VinculoMedicoPage: React.FC = () => {
     formData.append("excelFile", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/prf_saude/vincularbatch",
+        `${API_BASE}/prf_saude/vincularbatch`,
         {
           method: "POST",
           body: formData,
