@@ -14,7 +14,22 @@ dotenv.config({ path: envFile });
 
 let backendProcess: Electron.UtilityProcess | null = null;
 
-const backendPort: number = 8080;
+// PRD e HML podem estar instalados na mesma maquina e abertos ao mesmo tempo.
+// Sem separar porta e userData, o segundo a subir perde o socket em silencio e
+// o frontend acaba conversando com o backend do outro ambiente.
+const APP_ENV = process.env.APP_ENV ?? "prd";
+
+const PORTA_PADRAO: Record<string, number> = { prd: 8080, hml: 8081 };
+
+const backendPort: number =
+  Number(process.env.BACKEND_PORT) || PORTA_PADRAO[APP_ENV] || 8080;
+
+if (APP_ENV !== "prd") {
+  app.setPath(
+    "userData",
+    path.join(app.getPath("appData"), `${app.getName()}-${APP_ENV}`),
+  );
+}
 
 function setupAutoUpdater(win: BrowserWindow, logPath: string) {
   const updLog = (msg: string) => {
@@ -176,7 +191,11 @@ function createWindow() {
     icon: iconPath,
   });
 
-  win.loadFile(path.join(__dirname, "../frontend/dist/index.html"));
+  // O frontend le apiPort da query para montar a URL da API — sem isso ele
+  // assumiria 8080 e bateria no backend do outro ambiente.
+  win.loadFile(path.join(__dirname, "../frontend/dist/index.html"), {
+    query: { apiPort: backendPort.toString() },
+  });
 
   return win;
 }

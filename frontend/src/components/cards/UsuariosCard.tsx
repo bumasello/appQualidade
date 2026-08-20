@@ -1,3 +1,4 @@
+import { API_BASE as API } from "@/config/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +32,6 @@ interface Usuario {
   ATIVO: number;
 }
 
-const API = "http://localhost:8080";
 
 const Usuarios: React.FC = () => {
   const { auth } = useAuth();

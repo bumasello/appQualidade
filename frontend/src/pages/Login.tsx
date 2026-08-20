@@ -1,3 +1,4 @@
+import { API_BASE } from "@/config/api";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -49,7 +50,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSucess }) => {
     );
 
     try {
-      const res = await fetch("http://localhost:8080/user/login_user", {
+      const res = await fetch(`${API_BASE}/user/login_user`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -99,7 +100,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSucess }) => {
       return;
     }
 
-    const res = await fetch("http://localhost:8080/user/reset_password", {
+    const res = await fetch(`${API_BASE}/user/reset_password`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -142,7 +143,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSucess }) => {
     console.log(`Tentando realizar troca de senha para: Usuário: ${username}`);
 
     try {
-      const res = await fetch("http://localhost:8080/user/change_password", {
+      const res = await fetch(`${API_BASE}/user/change_password`, {
         method: "PATCH",
         headers: {
           Accept: "application/json",

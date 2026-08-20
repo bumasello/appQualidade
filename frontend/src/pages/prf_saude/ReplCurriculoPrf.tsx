@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { API_BASE } from "@/config/api";
 import {
   Card,
   CardContent,
@@ -45,7 +46,7 @@ const ReplCurriculoPrf: React.FC = () => {
       formData.append("file", file);
 
       const res = await fetch(
-        "http://localhost:8080/prf_saude/replicar_curriculo",
+        `${API_BASE}/prf_saude/replicar_curriculo`,
         {
           method: "POST",
           headers: {

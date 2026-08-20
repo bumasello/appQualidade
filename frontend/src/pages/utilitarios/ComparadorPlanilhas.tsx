@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { API_BASE } from "@/config/api";
 import {
   Card,
   CardContent,
@@ -115,7 +116,7 @@ const ComparadorPlanilhas: React.FC = () => {
       formData.append("selectedColumns", JSON.stringify(selectedColumns));
 
       const res = await fetch(
-        "http://localhost:8080/utilitarios/comparador-planilhas",
+        `${API_BASE}/utilitarios/comparador-planilhas`,
         {
           method: "POST",
           headers: {

@@ -35,7 +35,11 @@ const REQUIRED_ENV = [
   "MDM_TBL_EQUIPE_TELA",
 ];
 
-const app = new App(8080);
+// A porta vem do Electron (env PORT), que a define por ambiente para PRD e HML
+// nao disputarem o mesmo socket. Fora do Electron cai no padrao historico.
+const PORT = Number(process.env.PORT) || 8080;
+
+const app = new App(PORT);
 
 (async () => {
   try {
@@ -62,7 +66,7 @@ const app = new App(8080);
     console.log("Pool QLD criada.");
 
     app.listen();
-    console.log("Backend ouvindo na porta 8080.");
+    console.log(`Backend ouvindo na porta ${PORT}.`);
   } catch (error) {
     const msg =
       error instanceof Error ? (error.stack ?? error.message) : String(error);

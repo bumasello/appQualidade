@@ -1,3 +1,4 @@
+import { API_BASE as API } from "@/config/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, X } from "lucide-react";
 import type React from "react";
@@ -22,7 +23,6 @@ import {
   SelectValue,
 } from "../ui/select";
 
-const API = "http://localhost:8080";
 
 const CriarImportacao: React.FC = () => {
   const { auth } = useAuth();
