@@ -134,6 +134,7 @@ refactor(backend): extrai QLDService e QLDDatabase como módulos separados
 ## Observações
 
 - O `npm version` exige working directory limpo. Commita tudo antes.
+- **Só faça `git push --tags` quando o `dist` for rodar em seguida.** O electron-updater enxerga a tag no feed do GitHub e passa a considerá-la a versão mais nova; se não houver release publicada com os artefatos, todo app tenta baixar o `latest.yml` daquela tag e falha com 404 a cada start. Se a tag já foi publicada e o build vai demorar, tira ela do remoto até lá: `git push origin :refs/tags/vX.Y.Z` (a tag local continua intacta).
 - O `dist:prd` publica uma release **estável** no GitHub — usuários PRD atualizam automaticamente.
 - O `dist:hml` publica como **pre-release** — só apps HML recebem a atualização.
 - Nunca faça merge de `hml` para `master`. O merge sempre vai de `dev-*` para `master` diretamente.
